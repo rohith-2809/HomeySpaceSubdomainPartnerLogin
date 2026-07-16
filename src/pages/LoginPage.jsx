@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FiEye,
   FiEyeOff,
@@ -75,6 +76,7 @@ function TransparentLogo({ src, color = "original", className, alt = "HomeySpace
 /*                  LOGIN PAGE                     */
 /* ═══════════════════════════════════════════════ */
 export default function LoginPage() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -84,8 +86,11 @@ export default function LoginPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulated login — replace with real auth
-    setTimeout(() => setIsLoading(false), 2000);
+    // Simulated login — navigate to onboarding after delay
+    setTimeout(() => {
+      setIsLoading(false);
+      navigate("/onboarding/company-profile");
+    }, 1500);
   };
 
   return (
