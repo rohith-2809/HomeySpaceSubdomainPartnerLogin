@@ -59,12 +59,10 @@ function TransparentLogo({ src, color = "original", className, alt = "HomeySpace
 
 /* ─── Onboarding step definitions ─── */
 const STEPS = [
-  { number: 1, label: "Sign In",          path: "/" },
-  { number: 2, label: "Company Profile",  path: "/onboarding/company-profile" },
+  { number: 1, label: "Sign In",           path: "/" },
+  { number: 2, label: "Company Profile",   path: "/onboarding/company-profile" },
   { number: 3, label: "Basic Information", path: "/onboarding/basic-info" },
-  { number: 4, label: "Documents",         path: "/onboarding/documents" },
-  { number: 5, label: "Bank Details",      path: "/onboarding/bank-details" },
-  { number: 6, label: "Verification",      path: "/onboarding/verification" },
+  { number: 4, label: "Review & Confirm",  path: "/onboarding/review" },
 ];
 
 /* ═══════════════════════════════════════════════ */
@@ -77,6 +75,7 @@ export default function OnboardingLayout({
   formId,
   isSubmitting = false,
   hideNext = false,
+  hideBack = false,
   nextLabel = "Next",
 }) {
   const navigate = useNavigate();
@@ -249,11 +248,12 @@ export default function OnboardingLayout({
               id="btn-onboarding-back"
               type="button"
               onClick={handleBack}
-              className="group flex items-center gap-2 py-3 px-5 rounded-xl border border-border
+              className={`group flex items-center gap-2 py-3 px-5 rounded-xl border border-border
                          text-sm font-semibold text-text-body bg-white
                          hover:border-slate-300 hover:text-text-heading hover:-translate-x-px
                          active:translate-x-0 active:scale-[0.99]
-                         transition-all duration-300 cursor-pointer"
+                         transition-all duration-300 cursor-pointer
+                         ${hideBack ? "opacity-0 pointer-events-none" : "opacity-100"}`}
             >
               <FiArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform duration-300" />
               <span>Back</span>

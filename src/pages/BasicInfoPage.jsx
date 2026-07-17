@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FiHome,
   FiFileText,
@@ -14,6 +15,7 @@ import OnboardingLayout from "../components/OnboardingLayout";
 /*         SCREEN 2 — BASIC INFORMATION           */
 /* ═══════════════════════════════════════════════ */
 export default function BasicInfoPage() {
+  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form state
@@ -28,11 +30,9 @@ export default function BasicInfoPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate save — next steps (Documents, Bank Details, Verification) are disabled for now
     setTimeout(() => {
       setIsSubmitting(false);
-      // For now, just show an alert since later steps aren't built yet
-      alert("Basic Information saved! Further onboarding steps coming soon.");
+      navigate("/onboarding/review");
     }, 1200);
   };
 
