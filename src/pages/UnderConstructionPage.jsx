@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { FiTool, FiArrowLeft } from "react-icons/fi";
+import { FiArrowLeft, FiCompass } from "react-icons/fi";
 import DashboardLayout from "../components/DashboardLayout";
 
 export default function UnderConstructionPage() {
@@ -29,42 +29,50 @@ export default function UnderConstructionPage() {
       topBarTitle={featureName}
       topBarSubtitle="Coming Soon"
     >
-      <div className="flex flex-col items-center justify-center text-center h-[60vh] max-w-md mx-auto animate-fade-in">
+      <div className="relative w-full h-[calc(100vh-140px)] rounded-3xl overflow-hidden flex flex-col items-center justify-center bg-white border border-border">
         
-        {/* ── Icon ── */}
-        <div className="relative mb-6 animate-scale-in">
-          <div className="w-[84px] h-[84px] rounded-full bg-slate-100
-                          flex items-center justify-center border border-slate-200">
-            <div className="w-[60px] h-[60px] rounded-full bg-white shadow-sm
-                            flex items-center justify-center border border-slate-100">
-              <FiTool className="w-7 h-7 text-text-placeholder" strokeWidth={2} />
+        {/* ── Background Glow Effects ── */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-primary/5 rounded-[100%] blur-[80px] pointer-events-none animate-pulse-ring" />
+        <div className="absolute bottom-0 right-0 w-[500px] h-[400px] bg-amber-500/5 rounded-[100%] blur-[80px] pointer-events-none" />
+
+        {/* ── Content Container ── */}
+        <div className="relative z-10 flex flex-col items-center text-center max-w-2xl px-6">
+          
+          {/* Floating Premium Icon */}
+          <div className="mb-8 animate-float">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary-50 to-white
+                            border border-primary/20 shadow-[0_8px_32px_rgba(15,118,110,0.15)]
+                            flex items-center justify-center">
+              <FiCompass className="w-8 h-8 text-primary" strokeWidth={1.5} />
             </div>
           </div>
+
+          {/* Typography */}
+          <h2 className="text-3xl md:text-4xl font-bold text-text-heading tracking-tight mb-4 animate-fade-up delay-100">
+            Crafting the <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-light">{featureName}</span> Experience
+          </h2>
+          
+          <p className="text-base md:text-lg text-text-muted leading-relaxed max-w-lg mx-auto mb-10 animate-fade-up delay-200">
+            Our engineering and design teams are meticulously building this module to ensure it meets our highest standards. It will be available in an upcoming release.
+          </p>
+
+          {/* Action */}
+          <div className="animate-fade-up delay-300">
+            <button
+              type="button"
+              onClick={() => navigate("/dashboard")}
+              className="group flex items-center justify-center gap-2.5 py-3.5 px-8
+                         rounded-full bg-text-heading text-white text-sm font-semibold
+                         hover:bg-black hover:scale-105 active:scale-95
+                         shadow-xl shadow-slate-900/20
+                         transition-all duration-300 cursor-pointer"
+            >
+              <FiArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-300" />
+              <span>Return to Dashboard</span>
+            </button>
+          </div>
+
         </div>
-
-        {/* ── Heading & Text ── */}
-        <h2 className="text-xl font-bold text-text-heading tracking-tight mb-3 animate-fade-up delay-100">
-          Under Construction
-        </h2>
-        <p className="text-sm text-text-muted leading-relaxed mb-8 animate-fade-up delay-200">
-          The <span className="font-semibold text-text-body">{featureName}</span> module is currently being built. Our engineering team is actively working on it, and it will be available in an upcoming release.
-        </p>
-
-        {/* ── CTA ── */}
-        <button
-          type="button"
-          onClick={() => navigate("/dashboard")}
-          className="group flex items-center justify-center gap-2 py-3 px-6
-                     rounded-xl border border-border bg-white text-sm font-semibold text-text-body
-                     hover:border-slate-300 hover:text-text-heading hover:-translate-y-px
-                     active:translate-y-0 active:scale-[0.99]
-                     shadow-sm hover:shadow-md
-                     transition-all duration-300 cursor-pointer animate-fade-up delay-300"
-        >
-          <FiArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform duration-300" />
-          <span>Return to Dashboard</span>
-        </button>
-
       </div>
     </DashboardLayout>
   );

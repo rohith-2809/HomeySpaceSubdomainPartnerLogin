@@ -14,6 +14,7 @@ export default function CustomDatePicker({ value, onChange, placeholder = "Selec
   // Parse initial value or use current date for the calendar view
   const initialDate = value ? new Date(value) : new Date();
   const [viewDate, setViewDate] = useState(initialDate);
+  const [viewMode, setViewMode] = useState("date"); // "date", "month", "year"
 
   // Close calendar when clicking outside
   useEffect(() => {
@@ -33,11 +34,23 @@ export default function CustomDatePicker({ value, onChange, placeholder = "Selec
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
 
   const handlePrevMonth = () => {
-    setViewDate(new Date(currentYear, currentMonth - 1, 1));
+    if (viewMode === "year") {
+      setViewDate(new Date(currentYear - 12, currentMonth, 1));
+    } else if (viewMode === "month") {
+      setViewDate(new Date(currentYear - 1, currentMonth, 1));
+    } else {
+      setViewDate(new Date(currentYear, currentMonth - 1, 1));
+    }
   };
 
   const handleNextMonth = () => {
-    setViewDate(new Date(currentYear, currentMonth + 1, 1));
+    if (viewMode === "year") {
+      setViewDate(new Date(currentYear + 12, currentMonth, 1));
+    } else if (viewMode === "month") {
+      setViewDate(new Date(currentYear + 1, currentMonth, 1));
+    } else {
+      setViewDate(new Date(currentYear, currentMonth + 1, 1));
+    }
   };
 
   const handleSelectDate = (day) => {
@@ -113,9 +126,22 @@ export default function CustomDatePicker({ value, onChange, placeholder = "Selec
             >
               <FiChevronLeft className="w-5 h-5" />
             </button>
-            <span className="text-[15px] font-semibold text-text-heading">
-              {MONTHS[currentMonth]} {currentYear}
-            </span>
+            
+            <div className="flex items-center gap-1 text-[15px] font-semibold text-text-heading">
+              {viewMode === "date" && (
+                <>
+                  <button type="button" onClick={() => setViewMode("month")} className="hover:text-primary transition-colors px-1 py-0.5 rounded-md hover:bg-slate-50">{MONTHS[currentMonth]}</button>
+                  <button type="button" onClick={() => setViewMode("year")} className="hover:text-primary transition-colors px-1 py-0.5 rounded-md hover:bg-slate-50">{currentYear}</button>
+                </>
+              )}
+              {viewMode === "month" && (
+                <button type="button" onClick={() => setViewMode("year")} className="hover:text-primary transition-colors px-1 py-0.5 rounded-md hover:bg-slate-50">{currentYear}</button>
+              )}
+              {viewMode === "year" && (
+                <span>{currentYear - 4} - {currentYear + 7}</span>
+              )}
+            </div>
+
             <button 
               type="button" 
               onClick={handleNextMonth}
@@ -125,19 +151,64 @@ export default function CustomDatePicker({ value, onChange, placeholder = "Selec
             </button>
           </div>
 
-          {/* Days of Week */}
-          <div className="grid grid-cols-7 gap-1 mb-2">
-            {DAYS_OF_WEEK.map(day => (
-              <div key={day} className="w-8 h-8 flex items-center justify-center text-[13px] font-medium text-text-placeholder">
-                {day}
+          {/* Date View */}
+          {viewMode === "date" && (
+            <>
+              <div className="grid grid-cols-7 gap-1 mb-2">
+                {DAYS_OF_WEEK.map(day => (
+                  <div key={day} className="w-8 h-8 flex items-center justify-center text-[13px] font-medium text-text-placeholder">
+                    {day}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+              <div className="grid grid-cols-7 gap-1">
+                {gridCells}
+              </div>
+            </>
+          )}
 
-          {/* Days Grid */}
-          <div className="grid grid-cols-7 gap-1">
-            {gridCells}
-          </div>
+          {/* Month View */}
+          {viewMode === "month" && (
+            <div className="grid grid-cols-3 gap-2 py-2">
+              {MONTHS.map((month, idx) => (
+                <button
+                  key={month}
+                  type="button"
+                  onClick={() => {
+                    setViewDate(new Date(currentYear, idx, 1));
+                    setViewMode("date");
+                  }}
+                  className={`py-2 rounded-xl text-sm font-medium transition-colors
+                              ${currentMonth === idx ? "bg-primary text-white" : "text-text-heading hover:bg-slate-100"}`}
+                >
+                  {month.slice(0, 3)}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Year View */}
+          {viewMode === "year" && (
+            <div className="grid grid-cols-3 gap-2 py-2">
+              {Array.from({ length: 12 }).map((_, i) => {
+                const year = currentYear - 4 + i;
+                return (
+                  <button
+                    key={year}
+                    type="button"
+                    onClick={() => {
+                      setViewDate(new Date(year, currentMonth, 1));
+                      setViewMode("month");
+                    }}
+                    className={`py-2 rounded-xl text-sm font-medium transition-colors
+                                ${currentYear === year ? "bg-primary text-white" : "text-text-heading hover:bg-slate-100"}`}
+                  >
+                    {year}
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
         </div>
       )}

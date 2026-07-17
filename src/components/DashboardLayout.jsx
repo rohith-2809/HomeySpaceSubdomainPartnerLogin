@@ -6,6 +6,7 @@ import {
   FiSettings,
   FiLock,
   FiBell,
+  FiLogOut,
 } from "react-icons/fi";
 
 const NAV_ITEMS = [
@@ -74,22 +75,28 @@ export default function DashboardLayout({
           })}
         </nav>
 
-        {/* Status badge */}
-        {locked ? (
-          <div className="px-4 py-4 border-t border-border">
-            <div className="flex items-center gap-2.5 bg-amber-50 border border-amber-200 rounded-lg px-3.5 py-2.5">
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0" />
-              <span className="text-xs font-semibold text-amber-700">Verification Pending</span>
+        {/* Profile & Logout */}
+        <div className="p-4 border-t border-border mt-auto">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-white border-2 border-slate-100 overflow-hidden flex items-center justify-center shrink-0 shadow-sm">
+                <img src="/vasavi_logo.png" alt="Profile" className="w-full h-full object-contain p-0.5" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-sm font-bold text-text-heading leading-tight truncate w-[100px]">{partnerName}</span>
+                <span className="text-[11px] font-semibold text-text-muted mt-0.5">{locked ? "Pending" : "Verified"}</span>
+              </div>
             </div>
+            
+            <button 
+              onClick={() => navigate("/")}
+              className="p-2 text-text-muted hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+              title="Log Out"
+            >
+              <FiLogOut className="w-4 h-4" />
+            </button>
           </div>
-        ) : (
-          <div className="px-4 py-4 border-t border-border">
-            <div className="flex items-center gap-2.5 bg-primary-50 border border-primary/20 rounded-lg px-3.5 py-2.5">
-              <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
-              <span className="text-xs font-semibold text-primary">Verified Partner</span>
-            </div>
-          </div>
-        )}
+        </div>
       </aside>
 
       {/* ─────────── Main content (desktop: offset by sidebar) ─────────── */}

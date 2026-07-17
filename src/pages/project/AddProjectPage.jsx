@@ -3,10 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { FiArrowLeft, FiUploadCloud, FiChevronDown, FiArrowRight } from "react-icons/fi";
 import DashboardLayout from "../../components/DashboardLayout";
 import CustomDatePicker from "../../components/CustomDatePicker";
+import CustomSelect from "../../components/CustomSelect";
 
 export default function AddProjectPage() {
   const navigate = useNavigate();
   const [projectType, setProjectType] = useState("Apartments");
+  const [projectStatus, setProjectStatus] = useState("");
   const [launchDate, setLaunchDate] = useState("");
   const [possessionDate, setPossessionDate] = useState("");
 
@@ -94,19 +96,16 @@ export default function AddProjectPage() {
                 <label className="block text-sm font-medium text-text-heading">
                   Project Status
                 </label>
-                <div className="relative">
-                  <select
-                    className="w-full px-4 py-3 bg-white border border-border rounded-xl text-sm text-text-heading
-                               appearance-none focus:outline-none focus:ring-2 focus:ring-primary/20
-                               focus:border-primary transition-all cursor-pointer"
-                  >
-                    <option value="" disabled selected>Select status</option>
-                    <option value="under_construction">Under Construction</option>
-                    <option value="pre_launch">Pre-Launch</option>
-                    <option value="ready">Ready to Move</option>
-                  </select>
-                  <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
-                </div>
+                <CustomSelect
+                  value={projectStatus}
+                  onChange={setProjectStatus}
+                  placeholder="Select status"
+                  options={[
+                    { value: "under_construction", label: "Under Construction" },
+                    { value: "pre_launch", label: "Pre-Launch" },
+                    { value: "ready", label: "Ready to Move" }
+                  ]}
+                />
               </div>
 
               {/* Project Type */}
