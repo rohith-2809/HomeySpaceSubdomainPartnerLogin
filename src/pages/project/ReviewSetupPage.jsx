@@ -25,7 +25,7 @@ export default function ReviewSetupPage() {
             Review Setup
           </h2>
           <p className="text-sm text-text-muted leading-relaxed">
-            Review your unit configuration before finalising. Make sure all details are correct.
+            Verify your towers and units before publishing this project.
           </p>
         </div>
 
@@ -137,7 +137,7 @@ export default function ReviewSetupPage() {
                          transition-all duration-300 cursor-pointer"
             >
               <FiCheck className="w-4 h-4" />
-              <span>Confirm &amp; Continue</span>
+              <span>Confirm &amp; Save Project</span>
             </button>
           </div>
 
