@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage                from "./pages/LoginPage";
 import CompanyProfilePage       from "./pages/CompanyProfilePage";
 import BasicInfoPage            from "./pages/BasicInfoPage";
@@ -50,6 +50,10 @@ export default function App() {
         <Route path="/projects/new/towers"    element={<TowersBlocksPage />} />
         <Route path="/projects/new/units"     element={<UnitsSetupPage />} />
         <Route path="/projects/new/complete"  element={<ProjectCompletePage />} />
+
+        {/* ── Catch-all / 404 Redirects ── */}
+        <Route path="/index.html"             element={<Navigate to="/" replace />} />
+        <Route path="*"                       element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
