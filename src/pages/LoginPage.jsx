@@ -114,14 +114,14 @@ export default function LoginPage() {
         <div className="relative z-10 flex flex-col justify-between p-12 xl:p-16 w-full">
           {/* Logo */}
           <div className="animate-fade-up">
-            <div className="flex items-center gap-3">
+            <a href="https://homeyspace.in/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 w-fit hover:opacity-90 transition-opacity">
               <TransparentLogo
                 src="/HomeyspaceLogo.png"
                 color="white"
                 className="h-9 w-auto"
               />
               <span className="text-white text-xl font-bold tracking-tight">HomeySpace</span>
-            </div>
+            </a>
           </div>
 
           {/* Hero copy + feature grid */}
@@ -174,14 +174,14 @@ export default function LoginPage() {
       <div className="flex-1 flex items-center justify-center px-6 py-12 lg:px-12 bg-surface-page">
         <div className="w-full max-w-md space-y-8 animate-scale-in">
           {/* Mobile logo (hidden on desktop where left panel has it) */}
-          <div className="lg:hidden flex items-center gap-3 justify-center mb-2">
+          <a href="https://homeyspace.in/" target="_blank" rel="noopener noreferrer" className="lg:hidden flex items-center gap-3 justify-center mb-2 hover:opacity-90 transition-opacity">
             <TransparentLogo
               src="/HomeyspaceLogo.png"
               color="original"
               className="h-9 w-auto"
             />
             <span className="text-xl font-bold tracking-tight text-text-heading">HomeySpace</span>
-          </div>
+          </a>
 
           {/* Header */}
           <div className="text-center lg:text-left">

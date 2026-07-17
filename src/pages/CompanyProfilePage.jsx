@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  FiArrowRight,
   FiBriefcase,
   FiAward,
   FiMapPin,
@@ -63,8 +62,13 @@ export default function CompanyProfilePage() {
   };
 
   return (
-    <OnboardingLayout currentStep={2}>
-      <form onSubmit={handleSubmit} className="space-y-8">
+    <OnboardingLayout
+      currentStep={2}
+      formId="company-profile-form"
+      isSubmitting={isSubmitting}
+      hideNext={isCityOpen}
+    >
+      <form id="company-profile-form" onSubmit={handleSubmit} className="space-y-8">
         {/* Header */}
         <div className="space-y-2 animate-fade-up">
           <h2 className="text-2xl xl:text-[28px] font-bold text-text-heading tracking-tight">
@@ -176,7 +180,7 @@ export default function CompanyProfilePage() {
               City of Operations <span className="text-red-500">*</span>
             </label>
             <div className="relative group">
-              <FiMapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-text-placeholder group-focus-within:text-primary transition-colors duration-300 pointer-events-none z-10" />
+              <FiMapPin className="absolute left-3.5 top-[14px] w-[18px] h-[18px] text-text-placeholder transition-colors duration-300 pointer-events-none z-10" />
               <button
                 id="city-dropdown-trigger"
                 type="button"
@@ -192,15 +196,16 @@ export default function CompanyProfilePage() {
                 {city || "Select your city"}
               </button>
               <FiChevronDown
-                className={`absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-text-placeholder
+                className={`absolute right-3.5 top-[14px] w-[18px] h-[18px] text-text-placeholder
                            pointer-events-none transition-transform duration-300 ${isCityOpen ? "rotate-180" : ""}`}
               />
 
-              {/* Dropdown menu */}
+              {/* Dropdown menu — rendered below, not clipped */}
               {isCityOpen && (
-                <div className="absolute z-50 w-full mt-2 py-2 rounded-xl bg-white border border-border shadow-xl shadow-black/8
-                                max-h-52 overflow-y-auto animate-fade-up"
-                     style={{ animationDuration: "200ms" }}
+                <div
+                  className="absolute left-0 right-0 mt-2 py-2 rounded-xl bg-white border border-border
+                             shadow-2xl max-h-52 overflow-y-auto"
+                  style={{ zIndex: 9999, top: "100%" }}
                 >
                   {CITIES.map((c) => (
                     <button
@@ -212,8 +217,8 @@ export default function CompanyProfilePage() {
                       }}
                       className={`w-full text-left px-4 py-2.5 text-sm transition-colors duration-150 cursor-pointer
                                  ${city === c
-                                   ? "bg-primary/5 text-primary font-medium"
-                                   : "text-text-body hover:bg-surface-input"
+                                   ? "bg-primary/10 text-primary font-semibold"
+                                   : "text-text-body hover:bg-slate-50"
                                  }`}
                     >
                       {c}
@@ -225,42 +230,6 @@ export default function CompanyProfilePage() {
           </div>
         </div>
 
-        {/* Submit — "Next" button */}
-        <div className="pt-2 animate-fade-up delay-500">
-          <button
-            id="btn-company-profile-next"
-            type="submit"
-            disabled={isSubmitting}
-            className="group relative w-full sm:w-auto sm:min-w-[200px] sm:ml-auto flex items-center justify-center gap-2 py-3.5 px-8
-                       rounded-xl bg-primary text-white text-sm font-semibold
-                       hover:bg-primary-hover hover:-translate-y-px active:translate-y-0 active:scale-[0.99]
-                       disabled:opacity-70 disabled:cursor-not-allowed
-                       shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/25
-                       transition-all duration-300 cursor-pointer sm:float-right"
-          >
-            {isSubmitting ? (
-              <div className="flex items-center gap-2">
-                <svg
-                  className="animate-spin w-5 h-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                <span>Saving...</span>
-              </div>
-            ) : (
-              <>
-                <span>Next</span>
-                <FiArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-300" />
-              </>
-            )}
-          </button>
-          {/* Clear float */}
-          <div className="clear-both" />
-        </div>
       </form>
     </OnboardingLayout>
   );

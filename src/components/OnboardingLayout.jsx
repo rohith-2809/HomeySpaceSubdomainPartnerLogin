@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiCheck, FiChevronLeft } from "react-icons/fi";
+import { FiCheck, FiArrowLeft, FiArrowRight } from "react-icons/fi";
 
 /* ─── Logo helper (same as LoginPage) ─── */
 function TransparentLogo({ src, color = "original", className, alt = "HomeySpace" }) {
@@ -70,7 +70,15 @@ const STEPS = [
 /* ═══════════════════════════════════════════════ */
 /*           ONBOARDING LAYOUT SHELL              */
 /* ═══════════════════════════════════════════════ */
-export default function OnboardingLayout({ currentStep, children, onBack }) {
+export default function OnboardingLayout({
+  currentStep,
+  children,
+  onBack,
+  formId,
+  isSubmitting = false,
+  hideNext = false,
+  nextLabel = "Next",
+}) {
   const navigate = useNavigate();
 
   const handleBack = () => {
@@ -87,14 +95,14 @@ export default function OnboardingLayout({ currentStep, children, onBack }) {
       {/* ─────────────── MOBILE PROGRESS BAR (< 1024px) ─────────────── */}
       <div className="lg:hidden bg-gradient-to-r from-[#0c635c] via-primary to-primary-light px-5 py-4">
         <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2.5">
+          <a href="https://homeyspace.in/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2.5 hover:opacity-90 transition-opacity">
             <TransparentLogo
               src="/HomeyspaceLogo.png"
               color="white"
               className="h-7 w-auto"
             />
             <span className="text-white text-base font-bold tracking-tight">HomeySpace</span>
-          </div>
+          </a>
           <span className="text-white/70 text-xs font-medium tracking-wide">
             Step {currentStep} of {STEPS.length}
           </span>
@@ -144,14 +152,14 @@ export default function OnboardingLayout({ currentStep, children, onBack }) {
         <div className="relative z-10 flex flex-col justify-between p-10 xl:p-12 w-full">
           {/* Logo */}
           <div className="animate-fade-up">
-            <div className="flex items-center gap-3">
+            <a href="https://homeyspace.in/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 w-fit hover:opacity-90 transition-opacity">
               <TransparentLogo
                 src="/HomeyspaceLogo.png"
                 color="white"
                 className="h-9 w-auto"
               />
               <span className="text-white text-xl font-bold tracking-tight">HomeySpace</span>
-            </div>
+            </a>
 
             <p className="text-white/50 text-xs font-medium tracking-wider uppercase mt-8 mb-6">
               Setup Progress
@@ -231,20 +239,62 @@ export default function OnboardingLayout({ currentStep, children, onBack }) {
       {/* ─────────────── RIGHT FORM PANEL ─────────────── */}
       <div className="flex-1 flex items-start lg:items-center justify-center px-5 py-8 sm:px-8 lg:px-12 xl:px-16 bg-surface-page overflow-y-auto">
         <div className="w-full max-w-[640px] animate-scale-in">
-          {/* Back arrow */}
-          <button
-            id="btn-onboarding-back"
-            type="button"
-            onClick={handleBack}
-            className="group flex items-center gap-1.5 text-sm text-text-muted hover:text-text-heading mb-8 -ml-1
-                       transition-all duration-300 cursor-pointer"
-          >
-            <FiChevronLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform duration-300" />
-            <span>Back</span>
-          </button>
-
           {/* Form content injected here */}
           {children}
+
+          {/* ── Persistent Back / Next row ── */}
+          <div className="pt-6 flex items-center justify-between gap-4">
+            {/* Back */}
+            <button
+              id="btn-onboarding-back"
+              type="button"
+              onClick={handleBack}
+              className="group flex items-center gap-2 py-3 px-5 rounded-xl border border-border
+                         text-sm font-semibold text-text-body bg-white
+                         hover:border-slate-300 hover:text-text-heading hover:-translate-x-px
+                         active:translate-x-0 active:scale-[0.99]
+                         transition-all duration-300 cursor-pointer"
+            >
+              <FiArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform duration-300" />
+              <span>Back</span>
+            </button>
+
+            {/* Next — uses HTML5 form= attribute to submit the page form */}
+            <button
+              id="btn-onboarding-next"
+              type="submit"
+              form={formId}
+              disabled={isSubmitting}
+              className={`group relative flex items-center justify-center gap-2 py-3 px-8
+                         rounded-xl bg-primary text-white text-sm font-semibold min-w-[160px]
+                         hover:bg-primary-hover hover:-translate-y-px active:translate-y-0 active:scale-[0.99]
+                         disabled:opacity-70 disabled:cursor-not-allowed
+                         shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/25
+                         transition-all duration-300 cursor-pointer ${
+                           hideNext ? "opacity-0 pointer-events-none" : "opacity-100"
+                         }`}
+            >
+              {isSubmitting ? (
+                <div className="flex items-center gap-2">
+                  <svg
+                    className="animate-spin w-5 h-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  <span>Saving...</span>
+                </div>
+              ) : (
+                <>
+                  <span>{nextLabel}</span>
+                  <FiArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-300" />
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>

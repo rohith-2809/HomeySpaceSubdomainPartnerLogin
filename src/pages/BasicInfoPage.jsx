@@ -1,7 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
-  FiArrowRight,
   FiHome,
   FiFileText,
   FiUser,
@@ -16,7 +14,6 @@ import OnboardingLayout from "../components/OnboardingLayout";
 /*         SCREEN 2 — BASIC INFORMATION           */
 /* ═══════════════════════════════════════════════ */
 export default function BasicInfoPage() {
-  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form state
@@ -40,8 +37,12 @@ export default function BasicInfoPage() {
   };
 
   return (
-    <OnboardingLayout currentStep={3}>
-      <form onSubmit={handleSubmit} className="space-y-8">
+    <OnboardingLayout
+      currentStep={3}
+      formId="basic-info-form"
+      isSubmitting={isSubmitting}
+    >
+      <form id="basic-info-form" onSubmit={handleSubmit} className="space-y-8">
         {/* Header */}
         <div className="space-y-2 animate-fade-up">
           <h2 className="text-2xl xl:text-[28px] font-bold text-text-heading tracking-tight">
@@ -236,42 +237,6 @@ export default function BasicInfoPage() {
           </div>
         </div>
 
-        {/* Submit — "Next" button */}
-        <div className="pt-2 animate-fade-up delay-600">
-          <button
-            id="btn-basic-info-next"
-            type="submit"
-            disabled={isSubmitting}
-            className="group relative w-full sm:w-auto sm:min-w-[200px] sm:ml-auto flex items-center justify-center gap-2 py-3.5 px-8
-                       rounded-xl bg-primary text-white text-sm font-semibold
-                       hover:bg-primary-hover hover:-translate-y-px active:translate-y-0 active:scale-[0.99]
-                       disabled:opacity-70 disabled:cursor-not-allowed
-                       shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/25
-                       transition-all duration-300 cursor-pointer sm:float-right"
-          >
-            {isSubmitting ? (
-              <div className="flex items-center gap-2">
-                <svg
-                  className="animate-spin w-5 h-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                <span>Saving...</span>
-              </div>
-            ) : (
-              <>
-                <span>Next</span>
-                <FiArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-300" />
-              </>
-            )}
-          </button>
-          {/* Clear float */}
-          <div className="clear-both" />
-        </div>
       </form>
     </OnboardingLayout>
   );
