@@ -17,6 +17,7 @@ import AddProjectPage           from "./pages/project/AddProjectPage";
 import LocationDetailsPage      from "./pages/project/LocationDetailsPage";
 import TowersBlocksPage         from "./pages/project/TowersBlocksPage";
 import UnitsSetupPage           from "./pages/project/UnitsSetupPage";
+import ReviewSetupPage          from "./pages/project/ReviewSetupPage";
 import ProjectCompletePage      from "./pages/project/ProjectCompletePage";
 
 export default function App() {
@@ -49,6 +50,7 @@ export default function App() {
         <Route path="/projects/new/location"  element={<LocationDetailsPage />} />
         <Route path="/projects/new/towers"    element={<TowersBlocksPage />} />
         <Route path="/projects/new/units"     element={<UnitsSetupPage />} />
+        <Route path="/projects/new/review"    element={<ReviewSetupPage />} />
         <Route path="/projects/new/complete"  element={<ProjectCompletePage />} />
 
         {/* ── Catch-all / 404 Redirects ── */}

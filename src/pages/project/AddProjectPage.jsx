@@ -2,10 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiArrowLeft, FiUploadCloud, FiChevronDown, FiArrowRight } from "react-icons/fi";
 import DashboardLayout from "../../components/DashboardLayout";
+import CustomDatePicker from "../../components/CustomDatePicker";
 
 export default function AddProjectPage() {
   const navigate = useNavigate();
   const [projectType, setProjectType] = useState("Apartments");
+  const [launchDate, setLaunchDate] = useState("");
+  const [possessionDate, setPossessionDate] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -66,21 +69,6 @@ export default function AddProjectPage() {
                   type="text"
                   required
                   placeholder="e.g. Skyline Heights"
-                  className="w-full px-4 py-3 bg-white border border-border rounded-xl text-sm text-text-heading
-                             placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary/20
-                             focus:border-primary transition-all"
-                />
-              </div>
-
-              {/* Developer Company */}
-              <div className="space-y-1.5">
-                <label className="block text-sm font-medium text-text-heading">
-                  Developer Company *
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Horizon Developers"
                   className="w-full px-4 py-3 bg-white border border-border rounded-xl text-sm text-text-heading
                              placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary/20
                              focus:border-primary transition-all"
@@ -149,11 +137,10 @@ export default function AddProjectPage() {
                 <label className="block text-sm font-medium text-text-heading">
                   Launch Date
                 </label>
-                <input
-                  type="date"
-                  className="w-full px-4 py-3 bg-white border border-border rounded-xl text-sm text-text-heading
-                             focus:outline-none focus:ring-2 focus:ring-primary/20
-                             focus:border-primary transition-all text-left"
+                <CustomDatePicker
+                  value={launchDate}
+                  onChange={setLaunchDate}
+                  placeholder="Select launch date"
                 />
               </div>
 
@@ -162,11 +149,10 @@ export default function AddProjectPage() {
                 <label className="block text-sm font-medium text-text-heading">
                   Expected Possession
                 </label>
-                <input
-                  type="date"
-                  className="w-full px-4 py-3 bg-white border border-border rounded-xl text-sm text-text-heading
-                             focus:outline-none focus:ring-2 focus:ring-primary/20
-                             focus:border-primary transition-all text-left"
+                <CustomDatePicker
+                  value={possessionDate}
+                  onChange={setPossessionDate}
+                  placeholder="Select possession date"
                 />
               </div>
 

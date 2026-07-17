@@ -82,7 +82,7 @@ export default function UnitsSetupPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    navigate("/projects/new/complete");
+    navigate("/projects/new/review");
   };
 
   return (
