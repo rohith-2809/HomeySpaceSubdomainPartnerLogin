@@ -41,7 +41,7 @@ export default function AccountVerifiedPage() {
         {/* ── Single CTA — clean handoff, no secondary action ── */}
         <button
           type="button"
-          onClick={() => navigate("/status/pending")}
+          onClick={() => navigate("/dashboard")}
           className="w-full flex items-center justify-center py-3.5 px-6
                      rounded-xl bg-primary text-white text-sm font-semibold
                      hover:bg-primary-hover hover:-translate-y-px

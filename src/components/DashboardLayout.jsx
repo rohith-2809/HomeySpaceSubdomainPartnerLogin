@@ -9,18 +9,24 @@ import {
 } from "react-icons/fi";
 
 const NAV_ITEMS = [
-  { icon: FiGrid,       label: "Dashboard", path: "/status/pending", locked: false },
-  { icon: FiFolderPlus, label: "Projects",  path: null,              locked: true  },
-  { icon: FiUsers,      label: "Leads",     path: null,              locked: true  },
-  { icon: FiSettings,   label: "Settings",  path: null,              locked: true  },
+  { icon: FiGrid,       label: "Dashboard",     path: "/dashboard" },
+  { icon: FiFolderPlus, label: "Projects",      path: "/projects" },
+  { icon: FiUsers,      label: "Team Access",   path: "/team" },
+  { icon: FiSettings,   label: "Settings",      path: "/settings" },
 ];
 
 /* ═══════════════════════════════════════════════════════════ */
 /*       DASHBOARD LAYOUT  — Verification-Pending shell        */
 /* ═══════════════════════════════════════════════════════════ */
-export default function DashboardLayout({ children, partnerName = "Partner" }) {
-  const navigate  = useNavigate();
-  const location  = useLocation();
+export default function DashboardLayout({ 
+  children, 
+  partnerName = "Partner",
+  activeNav = "Dashboard",
+  locked = true,
+  topBarTitle = null,
+  topBarSubtitle = "Partner Dashboard",
+}) {
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-surface-page">
@@ -43,16 +49,17 @@ export default function DashboardLayout({ children, partnerName = "Partner" }) {
         {/* Nav items */}
         <nav className="flex-1 px-3 py-4 space-y-0.5">
           {NAV_ITEMS.map((item) => {
-            const isActive = location.pathname === item.path;
+            const isActive = activeNav === item.label;
+            const isItemLocked = locked && item.label !== "Dashboard";
             return (
               <button
                 key={item.label}
                 type="button"
-                onClick={() => !item.locked && item.path && navigate(item.path)}
-                disabled={item.locked}
+                onClick={() => !isItemLocked && item.path && navigate(item.path)}
+                disabled={isItemLocked}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
                             transition-all duration-200
-                            ${item.locked
+                            ${isItemLocked
                               ? "opacity-35 cursor-not-allowed text-text-body"
                               : isActive
                               ? "bg-primary/8 text-primary"
@@ -61,19 +68,28 @@ export default function DashboardLayout({ children, partnerName = "Partner" }) {
               >
                 <item.icon className="w-[18px] h-[18px] shrink-0" />
                 <span className="flex-1 text-left">{item.label}</span>
-                {item.locked && <FiLock className="w-3 h-3 opacity-60 shrink-0" />}
+                {isItemLocked && <FiLock className="w-3 h-3 opacity-60 shrink-0" />}
               </button>
             );
           })}
         </nav>
 
-        {/* Pending status badge */}
-        <div className="px-4 py-4 border-t border-border">
-          <div className="flex items-center gap-2.5 bg-amber-50 border border-amber-200 rounded-lg px-3.5 py-2.5">
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0" />
-            <span className="text-xs font-semibold text-amber-700">Verification Pending</span>
+        {/* Status badge */}
+        {locked ? (
+          <div className="px-4 py-4 border-t border-border">
+            <div className="flex items-center gap-2.5 bg-amber-50 border border-amber-200 rounded-lg px-3.5 py-2.5">
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0" />
+              <span className="text-xs font-semibold text-amber-700">Verification Pending</span>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="px-4 py-4 border-t border-border">
+            <div className="flex items-center gap-2.5 bg-primary-50 border border-primary/20 rounded-lg px-3.5 py-2.5">
+              <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
+              <span className="text-xs font-semibold text-primary">Verified Partner</span>
+            </div>
+          </div>
+        )}
       </aside>
 
       {/* ─────────── Main content (desktop: offset by sidebar) ─────────── */}
@@ -84,10 +100,10 @@ export default function DashboardLayout({ children, partnerName = "Partner" }) {
                            flex items-center justify-between">
           <div>
             <p className="text-[11px] font-medium text-text-placeholder uppercase tracking-wider">
-              Partner Dashboard
+              {topBarSubtitle}
             </p>
             <h1 className="text-base font-semibold text-text-heading leading-tight mt-0.5">
-              Hello, {partnerName} 👋
+              {topBarTitle || `Hello, ${partnerName} 👋`}
             </h1>
           </div>
           <button
@@ -111,16 +127,17 @@ export default function DashboardLayout({ children, partnerName = "Partner" }) {
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-border
                       flex safe-area-inset-bottom">
         {NAV_ITEMS.map((item) => {
-          const isActive = location.pathname === item.path;
+          const isActive = activeNav === item.label;
+          const isItemLocked = locked && item.label !== "Dashboard";
           return (
             <button
               key={item.label}
               type="button"
-              onClick={() => !item.locked && item.path && navigate(item.path)}
-              disabled={item.locked}
+              onClick={() => !isItemLocked && item.path && navigate(item.path)}
+              disabled={isItemLocked}
               className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 px-1
                           text-[10px] font-semibold tracking-wide transition-colors
-                          ${item.locked
+                          ${isItemLocked
                             ? "opacity-30 cursor-not-allowed text-text-muted"
                             : isActive
                             ? "text-primary"
@@ -129,7 +146,7 @@ export default function DashboardLayout({ children, partnerName = "Partner" }) {
             >
               <div className="relative">
                 <item.icon className="w-[20px] h-[20px]" />
-                {item.locked && (
+                {isItemLocked && (
                   <span className="absolute -top-1 -right-1.5 w-3.5 h-3.5 bg-slate-300 rounded-full
                                    flex items-center justify-center">
                     <FiLock className="w-1.5 h-1.5 text-white" />
