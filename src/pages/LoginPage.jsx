@@ -2,13 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth, routeForStatus } from "../context/AuthContext";
 import {
-  FiEye,
-  FiEyeOff,
   FiMail,
-  FiLock,
   FiArrowRight,
-  FiArrowLeft,
-  FiCheck,
   FiKey,
   FiGrid,
   FiBarChart2,
@@ -78,38 +73,17 @@ function TransparentLogo({ src, color = "original", className, alt = "HomeySpace
 /* ═══════════════════════════════════════════════ */
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { loginOrSignup, requestOtp, verifyOtp } = useAuth();
-  const [mode, setMode] = useState("password");   // "password" | "otp"
+  const { requestOtp, verifyOtp } = useAuth();
   const [otpStep, setOtpStep] = useState("email"); // "email" | "code"
   const [otpCode, setOtpCode] = useState("");
   const [info, setInfo] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [remember, setRemember] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
   const goByStatus = (data) => {
     const status = data.application_status || data.partner?.application_status || "draft";
     navigate(routeForStatus(status));
-  };
-
-  const switchMode = (m) => {
-    setMode(m); setError(""); setInfo(""); setOtpStep("email"); setOtpCode("");
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError(""); setIsLoading(true);
-    try {
-      // Existing partner -> logs in; new email -> creates the account.
-      const data = await loginOrSignup(email.trim(), password);
-      goByStatus(data);
-    } catch (err) {
-      setError(err.message || "Unable to sign in. Please try again.");
-      setIsLoading(false);
-    }
   };
 
   const handleSendOtp = async (e) => {
@@ -238,172 +212,8 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* ─── Method toggle: Password | One-time code ─── */}
-          <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-surface-input border border-border">
-            <button
-              type="button"
-              onClick={() => switchMode("password")}
-              className={`py-2 rounded-lg text-sm font-medium transition-all duration-200 ${mode === "password" ? "bg-white text-text-heading shadow-sm" : "text-text-muted hover:text-text-body"}`}
-            >
-              Password
-            </button>
-            <button
-              type="button"
-              onClick={() => switchMode("otp")}
-              className={`py-2 rounded-lg text-sm font-medium transition-all duration-200 ${mode === "otp" ? "bg-white text-text-heading shadow-sm" : "text-text-muted hover:text-text-body"}`}
-            >
-              One-time code
-            </button>
-          </div>
-
-          {/* ─── Password login ─── */}
-          {mode === "password" && (
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Email */}
-            <div className="space-y-1.5">
-              <label
-                htmlFor="email"
-                className="block text-xs font-semibold text-text-body uppercase tracking-wider"
-              >
-                Email address
-              </label>
-              <div className="relative group">
-                <FiMail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-text-placeholder group-focus-within:text-primary transition-colors duration-300 pointer-events-none" />
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  placeholder="you@company.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-surface-input border border-border
-                             text-sm text-text-heading placeholder:text-text-placeholder
-                             hover:border-slate-300 focus:outline-none focus:ring-4 focus:ring-primary/8 focus:border-border-focus
-                             transition-all duration-300 cubic-bezier(0.16, 1, 0.3, 1)"
-                />
-              </div>
-            </div>
-
-            {/* Password */}
-            <div className="space-y-1.5">
-              <label
-                htmlFor="password"
-                className="block text-xs font-semibold text-text-body uppercase tracking-wider"
-              >
-                Password
-              </label>
-              <div className="relative group">
-                <FiLock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-text-placeholder group-focus-within:text-primary transition-colors duration-300 pointer-events-none" />
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  required
-                  autoComplete="current-password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-11 pr-12 py-3 rounded-xl bg-surface-input border border-border
-                             text-sm text-text-heading placeholder:text-text-placeholder
-                             hover:border-slate-300 focus:outline-none focus:ring-4 focus:ring-primary/8 focus:border-border-focus
-                             transition-all duration-300 cubic-bezier(0.16, 1, 0.3, 1)"
-                />
-                <button
-                  type="button"
-                  id="btn-toggle-password"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-text-placeholder
-                             hover:text-text-body transition-colors duration-200 cursor-pointer"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? <FiEyeOff className="w-[18px] h-[18px]" /> : <FiEye className="w-[18px] h-[18px]" />}
-                </button>
-              </div>
-            </div>
-
-            {/* Remember + Forgot */}
-            <div className="flex items-center justify-between">
-              <label
-                htmlFor="remember"
-                className="flex items-center gap-2.5 cursor-pointer group"
-              >
-                <div className="relative">
-                  <input
-                    id="remember"
-                    name="remember"
-                    type="checkbox"
-                    checked={remember}
-                    onChange={(e) => setRemember(e.target.checked)}
-                    className="sr-only"
-                  />
-                  <div
-                    className={`w-[18px] h-[18px] rounded-md border transition-all duration-300
-                               flex items-center justify-center group-hover:border-slate-400
-                               ${remember
-                                 ? "bg-primary border-primary"
-                                 : "bg-white border-border"
-                               }`}
-                  >
-                    <FiCheck className={`w-3 h-3 text-white transition-all duration-200 ${remember ? "opacity-100 scale-100" : "opacity-0 scale-75"}`} />
-                  </div>
-                </div>
-                <span className="text-sm text-text-muted group-hover:text-text-body transition-colors duration-200 select-none">Remember me</span>
-              </label>
-              <a
-                href="#"
-                id="link-forgot-password"
-                className="text-sm font-medium text-primary hover:text-primary-hover hover:underline transition-colors duration-200"
-              >
-                Forgot password?
-              </a>
-            </div>
-
-            {/* Error */}
-            {error && (
-              <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-                {error}
-              </div>
-            )}
-
-            {/* Submit */}
-            <button
-              id="btn-login-submit"
-              type="submit"
-              disabled={isLoading}
-              className="group relative w-full flex items-center justify-center gap-2 py-3.5 px-6
-                         rounded-xl bg-primary text-white text-sm font-semibold
-                         hover:bg-primary-hover hover:-translate-y-px active:translate-y-0 active:scale-[0.99]
-                         disabled:opacity-70 disabled:cursor-not-allowed
-                         shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/25
-                         transition-all duration-300 cubic-bezier(0.16, 1, 0.3, 1) cursor-pointer"
-            >
-              {isLoading ? (
-                <div className="flex items-center gap-2">
-                  <svg
-                    className="animate-spin w-5 h-5 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  <span>Signing in...</span>
-                </div>
-              ) : (
-                <>
-                  <span>Sign in</span>
-                  <FiArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-300" />
-                </>
-              )}
-            </button>
-          </form>
-          )}
 
           {/* ─── One-time code (OTP) login ─── */}
-          {mode === "otp" && (
           <form onSubmit={otpStep === "email" ? handleSendOtp : handleVerifyOtp} className="space-y-5">
             {/* Email */}
             <div className="space-y-1.5">
@@ -512,26 +322,12 @@ export default function LoginPage() {
               )}
             </button>
 
-            {otpStep === "email" && (
-              <button type="button" onClick={() => switchMode("password")}
-                className="w-full flex items-center justify-center gap-1.5 text-sm font-medium text-text-muted hover:text-text-body transition-colors">
-                <FiArrowLeft className="w-4 h-4" /> Sign in with password instead
-              </button>
-            )}
           </form>
-          )}
 
           {/* ─── Footer ─── */}
           <p className="text-center text-sm text-text-muted">
-            Don't have an account?{" "}
-            <button
-              type="button"
-              id="link-signup"
-              onClick={() => switchMode("otp")}
-              className="font-semibold text-primary hover:text-primary-hover hover:underline transition-colors duration-200"
-            >
-              Sign up with a one-time code
-            </button>
+            New partner?{" "}
+            <span className="font-semibold text-primary">just enter your email above to get started</span>
           </p>
         </div>
       </div>
