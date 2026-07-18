@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth, routeForStatus } from "../context/AuthContext";
 import {
   FiEye,
   FiEyeOff,
@@ -77,20 +78,27 @@ function TransparentLogo({ src, color = "original", className, alt = "HomeySpace
 /* ═══════════════════════════════════════════════ */
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { loginOrSignup } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     setIsLoading(true);
-    // Simulated login — navigate to onboarding after delay
-    setTimeout(() => {
+    try {
+      // Existing partner -> logs in; new email -> creates the account.
+      const data = await loginOrSignup(email.trim(), password);
+      const status = data.application_status || data.partner?.application_status || "draft";
+      navigate(routeForStatus(status));
+    } catch (err) {
+      setError(err.message || "Unable to sign in. Please try again.");
       setIsLoading(false);
-      navigate("/onboarding/company-profile");
-    }, 1500);
+    }
   };
 
   return (
@@ -332,6 +340,13 @@ export default function LoginPage() {
                 Forgot password?
               </a>
             </div>
+
+            {/* Error */}
+            {error && (
+              <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+                {error}
+              </div>
+            )}
 
             {/* Submit */}
             <button

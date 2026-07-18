@@ -2,22 +2,38 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiArrowLeft, FiMoreVertical, FiPlus, FiArrowRight, FiTrash2, FiChevronDown } from "react-icons/fi";
 import DashboardLayout from "../../components/DashboardLayout";
+import { useProjectSetup } from "../../context/ProjectSetupContext";
 
 const BHK_OPTIONS = ["1 BHK", "2 BHK", "3 BHK", "4 BHK", "4+ BHK"];
 const FACING_OPTIONS = ["North", "East", "South", "West"];
 
 export default function UnitsSetupPage() {
   const navigate = useNavigate();
+  const { data, patch } = useProjectSetup();
 
-  const [configs, setConfigs] = useState([
-    {
-      id: 1,
-      bhk: "3 BHK",
-      sizes: [{ id: 1, area: "", unit: "Sq. Ft." }],
-      facing: ["East"],
-      numbering: ""
+  const [configs, setConfigs] = useState(() => {
+    if (data.configurations && data.configurations.length > 0) {
+      return data.configurations.map((c, i) => ({
+        id: i + 1,
+        bhk: c.bhk || "3 BHK",
+        sizes: (c.sizes && c.sizes.length > 0
+          ? c.sizes
+          : [{ area: "", unit: "Sq. Ft." }]
+        ).map((s, si) => ({ id: si + 1, area: s.area ?? "", unit: s.unit || "Sq. Ft." })),
+        facing: c.facing || [],
+        numbering: c.numbering || "",
+      }));
     }
-  ]);
+    return [
+      {
+        id: 1,
+        bhk: "3 BHK",
+        sizes: [{ id: 1, area: "", unit: "Sq. Ft." }],
+        facing: ["East"],
+        numbering: ""
+      }
+    ];
+  });
 
   const handleAddConfig = () => {
     setConfigs([...configs, {
@@ -82,6 +98,14 @@ export default function UnitsSetupPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    patch({
+      configurations: configs.map((c) => ({
+        bhk: c.bhk,
+        sizes: c.sizes.map(({ area, unit }) => ({ area, unit })),
+        facing: c.facing,
+        numbering: c.numbering,
+      })),
+    });
     navigate("/projects/new/review");
   };
 

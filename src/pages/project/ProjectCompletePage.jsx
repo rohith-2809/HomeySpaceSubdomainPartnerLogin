@@ -1,9 +1,27 @@
 import { useNavigate } from "react-router-dom";
 import { FiCheck, FiMapPin, FiGrid, FiLayers } from "react-icons/fi";
 import StatusLayout from "../../components/StatusLayout";
+import { useProjectSetup } from "../../context/ProjectSetupContext";
 
 export default function ProjectCompletePage() {
   const navigate = useNavigate();
+  const { data, reset } = useProjectSetup();
+
+  const towers = data.towers || [];
+  const towerCount = towers.length;
+  const floorCount = towers.reduce((n, t) => n + (parseInt(t.floors) || 0), 0);
+  const unitCount = towers.reduce(
+    (n, t) => n + (parseInt(t.floors) || 0) * (parseInt(t.unitsPerFloor) || 0),
+    0
+  );
+  const bhkCount = (data.configurations || []).length;
+  const location = [data.city, data.state].filter(Boolean).join(", ");
+
+  const handleFinish = () => {
+    const id = data.createdProjectId;
+    reset();
+    navigate(id ? `/projects/${id}` : "/projects");
+  };
 
   return (
     <StatusLayout>
@@ -25,44 +43,46 @@ export default function ProjectCompletePage() {
           Setup Completed
         </h2>
         <p className="text-sm text-text-muted leading-relaxed mb-8 animate-fade-up delay-200">
-          Towers and units for <strong>Horizon Estates</strong> have been configured successfully.
+          Towers and units for <strong>{data.name || "your project"}</strong> have been configured successfully.
         </p>
 
         {/* ── Highlighted Stat Strip ── */}
         <div className="w-full text-left bg-primary-50 rounded-xl border border-primary-100 p-5 mb-8 animate-fade-up delay-300 shadow-sm">
           <div className="flex gap-4 mb-4 pb-4 border-b border-primary/10">
-            {/* Cover Thumbnail Placeholder */}
+            {/* Cover Thumbnail */}
             <div className="w-12 h-12 rounded-lg bg-white shrink-0 overflow-hidden border border-primary/20 shadow-sm">
-               <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=150&q=80" alt="Cover" className="w-full h-full object-cover" />
+               <img src={data.coverPreview || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=150&q=80"} alt="Cover" className="w-full h-full object-cover" />
             </div>
-            
+
             {/* Project Info */}
             <div className="flex-1 min-w-0 py-0.5">
               <h3 className="text-base font-bold text-primary-hover truncate">
-                Horizon Estates
+                {data.name || "Your Project"}
               </h3>
-              <p className="flex items-center gap-1.5 text-xs text-primary/70 mt-1 truncate font-medium">
-                <FiMapPin className="w-3.5 h-3.5 shrink-0" />
-                Bengaluru, Karnataka
-              </p>
+              {location && (
+                <p className="flex items-center gap-1.5 text-xs text-primary/70 mt-1 truncate font-medium">
+                  <FiMapPin className="w-3.5 h-3.5 shrink-0" />
+                  {location}
+                </p>
+              )}
             </div>
           </div>
 
           <div className="grid grid-cols-4 gap-2 text-center">
             <div>
-              <p className="text-lg font-bold text-primary-hover">1</p>
-              <p className="text-[10px] font-semibold text-primary/70 uppercase tracking-wider mt-0.5">Tower</p>
+              <p className="text-lg font-bold text-primary-hover">{towerCount}</p>
+              <p className="text-[10px] font-semibold text-primary/70 uppercase tracking-wider mt-0.5">{towerCount === 1 ? "Tower" : "Towers"}</p>
             </div>
             <div>
-              <p className="text-lg font-bold text-primary-hover">30</p>
+              <p className="text-lg font-bold text-primary-hover">{floorCount}</p>
               <p className="text-[10px] font-semibold text-primary/70 uppercase tracking-wider mt-0.5">Floors</p>
             </div>
             <div>
-              <p className="text-lg font-bold text-primary-hover">300</p>
+              <p className="text-lg font-bold text-primary-hover">{unitCount}</p>
               <p className="text-[10px] font-semibold text-primary/70 uppercase tracking-wider mt-0.5">Units</p>
             </div>
             <div>
-              <p className="text-lg font-bold text-primary-hover">1</p>
+              <p className="text-lg font-bold text-primary-hover">{bhkCount}</p>
               <p className="text-[10px] font-semibold text-primary/70 uppercase tracking-wider mt-0.5">BHK Types</p>
             </div>
           </div>
@@ -94,7 +114,7 @@ export default function ProjectCompletePage() {
         {/* ── Single CTA ── */}
         <button
           type="button"
-          onClick={() => navigate("/projects/vasavi-skies")}
+          onClick={handleFinish}
           className="w-full flex items-center justify-center py-3.5 px-6
                      rounded-xl bg-primary text-white text-sm font-semibold
                      hover:bg-primary-hover hover:-translate-y-px

@@ -8,6 +8,7 @@ import {
   FiBell,
   FiLogOut,
 } from "react-icons/fi";
+import { useAuth } from "../context/AuthContext";
 
 const NAV_ITEMS = [
   { icon: FiGrid,       label: "Dashboard",     path: "/dashboard" },
@@ -28,6 +29,16 @@ export default function DashboardLayout({
   topBarSubtitle = "Partner Dashboard",
 }) {
   const navigate = useNavigate();
+  const { partner, status, logout } = useAuth();
+
+  // Real partner name (falls back to the passed-in prop/default) and status badge.
+  const displayName = partner?.business_name || partnerName;
+  const statusLabel = status === "verified" ? "Verified" : "Pending";
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-surface-page">
@@ -83,13 +94,13 @@ export default function DashboardLayout({
                 <img src="/vasavi_logo.png" alt="Profile" className="w-full h-full object-contain p-0.5" />
               </div>
               <div className="flex flex-col">
-                <span className="text-sm font-bold text-text-heading leading-tight truncate w-[100px]">{partnerName}</span>
-                <span className="text-[11px] font-semibold text-text-muted mt-0.5">{locked ? "Pending" : "Verified"}</span>
+                <span className="text-sm font-bold text-text-heading leading-tight truncate w-[100px]">{displayName}</span>
+                <span className="text-[11px] font-semibold text-text-muted mt-0.5">{statusLabel}</span>
               </div>
             </div>
             
-            <button 
-              onClick={() => navigate("/")}
+            <button
+              onClick={handleLogout}
               className="p-2 text-text-muted hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
               title="Log Out"
             >
@@ -110,7 +121,7 @@ export default function DashboardLayout({
               {topBarSubtitle}
             </p>
             <h1 className="text-base font-semibold text-text-heading leading-tight mt-0.5">
-              {topBarTitle || `Hello, ${partnerName} 👋`}
+              {topBarTitle || `Hello, ${displayName} 👋`}
             </h1>
           </div>
           <button

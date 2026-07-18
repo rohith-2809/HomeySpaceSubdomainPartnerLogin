@@ -1,4 +1,5 @@
 import { createContext, useState, useContext } from "react";
+import { api } from "../api/client";
 
 const AssignUnitContext = createContext();
 
@@ -41,8 +42,28 @@ export function AssignUnitProvider({ children }) {
     setDraftData(initialDraftState);
   };
 
+  // POST the accumulated draft to the backend assign endpoint.
+  const submitAssignment = async () => {
+    const d = draftData;
+    const projectId = d.projectId;
+    const unitId = d.flat?.id;
+    if (!projectId || !unitId) throw new Error("Missing unit selection.");
+    const body = {
+      buyer_name: d.buyer?.fullName || "",
+      buyer_email: d.buyer?.email || "",
+      buyer_phone: d.buyer?.phone || "",
+      booking_date: d.booking?.date || "",
+      booking_amount: String(d.booking?.amount || "").replace(/[^\d.]/g, ""),
+      notes: d.booking?.notes || "",
+      super_area: d.flat?.size || "",
+      facing: d.flat?.facing || "",
+      floor_plan: d.flat?.plan || "",
+    };
+    return api.post(`/partner/builder-projects/${projectId}/units/${unitId}/assign/`, body);
+  };
+
   return (
-    <AssignUnitContext.Provider value={{ draftData, updateDraft, setFlatSelection, clearDraft }}>
+    <AssignUnitContext.Provider value={{ draftData, updateDraft, setFlatSelection, clearDraft, submitAssignment }}>
       {children}
     </AssignUnitContext.Provider>
   );

@@ -2,26 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiEdit2, FiArrowRight, FiArrowLeft, FiUser } from "react-icons/fi";
 import OnboardingLayout from "../components/OnboardingLayout";
-
-/* ─── Placeholder data ─────────────────────────────────────────────────────
-   In production these values come from a shared context / store that is
-   populated as the user moves through steps 2 & 3.                         */
-const PROFILE = {
-  logoUrl: null,
-  experience: "12 years",
-  projectsCompleted: "25",
-  city: "Mumbai",
-};
-
-const BASIC = {
-  companyName: "Skyline Developers Pvt. Ltd.",
-  gstNumber: "22AAAAA0000A1Z5",
-  authorizedPerson: "Rajesh Kumar",
-  email: "rajesh@skylinedev.com",
-  phone: "+91 98765 43210",
-  website: "https://skylinedev.com",
-  officeAddress: "501, Tower B, Tech Park, Whitefield, Bangalore 560066",
-};
+import { useOnboarding } from "../context/OnboardingContext";
 
 /* ─── Read-only row component ─── */
 function ReviewRow({ label, value }) {
@@ -40,15 +21,23 @@ function ReviewRow({ label, value }) {
 /* ═══════════════════════════════════════════════ */
 export default function ReviewConfirmPage() {
   const navigate = useNavigate();
+  const { data, submitOnboarding } = useOnboarding();
+  const PROFILE = data.profile;
+  const BASIC = data.basic;
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      await submitOnboarding();
       navigate("/status/submitted");
-    }, 1500);
+    } catch (err) {
+      setError(err?.message || "Something went wrong. Please try again.");
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -111,9 +100,9 @@ export default function ReviewConfirmPage() {
               <p className="text-[11px] font-semibold text-text-placeholder uppercase tracking-wider mb-2">
                 Company Logo
               </p>
-              {PROFILE.logoUrl ? (
+              {PROFILE.logoPreview ? (
                 <img
-                  src={PROFILE.logoUrl}
+                  src={PROFILE.logoPreview}
                   alt="Company logo"
                   className="w-12 h-12 rounded-full object-cover border border-border"
                 />
@@ -149,12 +138,19 @@ export default function ReviewConfirmPage() {
             <ReviewRow label="Registered Company Name"   value={BASIC.companyName} />
             <ReviewRow label="GST Number"                value={BASIC.gstNumber} />
             <ReviewRow label="Authorized Person Name"    value={BASIC.authorizedPerson} />
-            <ReviewRow label="Email Address"             value={BASIC.email} />
-            <ReviewRow label="Phone Number"              value={BASIC.phone} />
-            <ReviewRow label="Website URL"               value={BASIC.website} />
+            <ReviewRow label="Email Address"             value={BASIC.emailAddress} />
+            <ReviewRow label="Phone Number"              value={BASIC.phoneNumber} />
+            <ReviewRow label="Website URL"               value={BASIC.websiteUrl} />
             <ReviewRow label="Registered Office Address" value={BASIC.officeAddress} />
           </div>
         </div>
+
+        {/* ── Inline error ── */}
+        {error && (
+          <p className="text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3 animate-fade-up">
+            {error}
+          </p>
+        )}
 
         {/* ── Action buttons — full-width stack ── */}
         <div className="space-y-3 animate-fade-up delay-300">

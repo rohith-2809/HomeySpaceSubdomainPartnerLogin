@@ -10,30 +10,29 @@ import {
   FiMapPin,
 } from "react-icons/fi";
 import OnboardingLayout from "../components/OnboardingLayout";
+import { useOnboarding } from "../context/OnboardingContext";
 
 /* ═══════════════════════════════════════════════ */
 /*         SCREEN 2 — BASIC INFORMATION           */
 /* ═══════════════════════════════════════════════ */
 export default function BasicInfoPage() {
   const navigate = useNavigate();
+  const { data, setBasic } = useOnboarding();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Form state
-  const [companyName, setCompanyName] = useState("");
-  const [gstNumber, setGstNumber] = useState("");
-  const [authorizedPerson, setAuthorizedPerson] = useState("");
-  const [emailAddress, setEmailAddress] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [websiteUrl, setWebsiteUrl] = useState("");
-  const [officeAddress, setOfficeAddress] = useState("");
+  // Form state — initialized from onboarding context so values persist on back-nav.
+  const [companyName, setCompanyName] = useState(data.basic.companyName);
+  const [gstNumber, setGstNumber] = useState(data.basic.gstNumber);
+  const [authorizedPerson, setAuthorizedPerson] = useState(data.basic.authorizedPerson);
+  const [emailAddress, setEmailAddress] = useState(data.basic.emailAddress);
+  const [phoneNumber, setPhoneNumber] = useState(data.basic.phoneNumber);
+  const [websiteUrl, setWebsiteUrl] = useState(data.basic.websiteUrl);
+  const [officeAddress, setOfficeAddress] = useState(data.basic.officeAddress);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      navigate("/onboarding/review");
-    }, 1200);
+    navigate("/onboarding/review");
   };
 
   return (
@@ -72,7 +71,10 @@ export default function BasicInfoPage() {
                 required
                 placeholder="e.g. Skyline Developers Pvt. Ltd."
                 value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
+                onChange={(e) => {
+                  setCompanyName(e.target.value);
+                  setBasic({ companyName: e.target.value });
+                }}
                 className="w-full pl-11 pr-4 py-3 rounded-xl bg-surface-input border border-border
                            text-sm text-text-heading placeholder:text-text-placeholder
                            hover:border-slate-300 focus:outline-none focus:ring-4 focus:ring-primary/8 focus:border-border-focus
@@ -98,7 +100,11 @@ export default function BasicInfoPage() {
                 required
                 placeholder="e.g. 22AAAAA0000A1Z5"
                 value={gstNumber}
-                onChange={(e) => setGstNumber(e.target.value.toUpperCase())}
+                onChange={(e) => {
+                  const v = e.target.value.toUpperCase();
+                  setGstNumber(v);
+                  setBasic({ gstNumber: v });
+                }}
                 className="w-full pl-11 pr-4 py-3 rounded-xl bg-surface-input border border-border
                            text-sm text-text-heading placeholder:text-text-placeholder
                            hover:border-slate-300 focus:outline-none focus:ring-4 focus:ring-primary/8 focus:border-border-focus
@@ -124,7 +130,10 @@ export default function BasicInfoPage() {
                 required
                 placeholder="e.g. Rajesh Kumar"
                 value={authorizedPerson}
-                onChange={(e) => setAuthorizedPerson(e.target.value)}
+                onChange={(e) => {
+                  setAuthorizedPerson(e.target.value);
+                  setBasic({ authorizedPerson: e.target.value });
+                }}
                 className="w-full pl-11 pr-4 py-3 rounded-xl bg-surface-input border border-border
                            text-sm text-text-heading placeholder:text-text-placeholder
                            hover:border-slate-300 focus:outline-none focus:ring-4 focus:ring-primary/8 focus:border-border-focus
@@ -150,7 +159,10 @@ export default function BasicInfoPage() {
                 required
                 placeholder="e.g. rajesh@skylinedev.com"
                 value={emailAddress}
-                onChange={(e) => setEmailAddress(e.target.value)}
+                onChange={(e) => {
+                  setEmailAddress(e.target.value);
+                  setBasic({ emailAddress: e.target.value });
+                }}
                 className="w-full pl-11 pr-4 py-3 rounded-xl bg-surface-input border border-border
                            text-sm text-text-heading placeholder:text-text-placeholder
                            hover:border-slate-300 focus:outline-none focus:ring-4 focus:ring-primary/8 focus:border-border-focus
@@ -176,7 +188,10 @@ export default function BasicInfoPage() {
                 required
                 placeholder="e.g. +91 98765 43210"
                 value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
+                onChange={(e) => {
+                  setPhoneNumber(e.target.value);
+                  setBasic({ phoneNumber: e.target.value });
+                }}
                 className="w-full pl-11 pr-4 py-3 rounded-xl bg-surface-input border border-border
                            text-sm text-text-heading placeholder:text-text-placeholder
                            hover:border-slate-300 focus:outline-none focus:ring-4 focus:ring-primary/8 focus:border-border-focus
@@ -201,7 +216,10 @@ export default function BasicInfoPage() {
                 type="url"
                 placeholder="e.g. https://skylinedev.com"
                 value={websiteUrl}
-                onChange={(e) => setWebsiteUrl(e.target.value)}
+                onChange={(e) => {
+                  setWebsiteUrl(e.target.value);
+                  setBasic({ websiteUrl: e.target.value });
+                }}
                 className="w-full pl-11 pr-4 py-3 rounded-xl bg-surface-input border border-border
                            text-sm text-text-heading placeholder:text-text-placeholder
                            hover:border-slate-300 focus:outline-none focus:ring-4 focus:ring-primary/8 focus:border-border-focus
@@ -227,7 +245,10 @@ export default function BasicInfoPage() {
                 rows={3}
                 placeholder="e.g. 501, Tower B, Tech Park, Whitefield, Bangalore 560066"
                 value={officeAddress}
-                onChange={(e) => setOfficeAddress(e.target.value)}
+                onChange={(e) => {
+                  setOfficeAddress(e.target.value);
+                  setBasic({ officeAddress: e.target.value });
+                }}
                 className="w-full pl-11 pr-4 py-3 rounded-xl bg-surface-input border border-border
                            text-sm text-text-heading placeholder:text-text-placeholder resize-none
                            hover:border-slate-300 focus:outline-none focus:ring-4 focus:ring-primary/8 focus:border-border-focus

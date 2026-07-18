@@ -4,16 +4,40 @@ import { FiArrowLeft, FiUploadCloud, FiChevronDown, FiArrowRight } from "react-i
 import DashboardLayout from "../../components/DashboardLayout";
 import CustomDatePicker from "../../components/CustomDatePicker";
 import CustomSelect from "../../components/CustomSelect";
+import { useProjectSetup } from "../../context/ProjectSetupContext";
 
 export default function AddProjectPage() {
   const navigate = useNavigate();
-  const [projectType, setProjectType] = useState("Apartments");
-  const [projectStatus, setProjectStatus] = useState("");
-  const [launchDate, setLaunchDate] = useState("");
-  const [possessionDate, setPossessionDate] = useState("");
+  const { data, patch } = useProjectSetup();
+
+  const [name, setName] = useState(data.name || "");
+  const [reraNumber, setReraNumber] = useState(data.reraNumber || "");
+  const [description, setDescription] = useState(data.description || "");
+  const [coverPreview, setCoverPreview] = useState(data.coverPreview || "");
+  const [projectType, setProjectType] = useState(data.projectType || "Apartments");
+  const [projectStatus, setProjectStatus] = useState(data.projectStatus || "");
+  const [launchDate, setLaunchDate] = useState(data.launchDate || "");
+  const [possessionDate, setPossessionDate] = useState(data.possessionDate || "");
+
+  const handleCoverChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const preview = URL.createObjectURL(file);
+    setCoverPreview(preview);
+    patch({ cover: file, coverPreview: preview });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    patch({
+      name,
+      reraNumber,
+      projectStatus,
+      projectType,
+      launchDate,
+      possessionDate,
+      description,
+    });
     navigate("/projects/new/location");
   };
 
@@ -41,16 +65,20 @@ export default function AddProjectPage() {
             <div className="relative group flex flex-col items-center justify-center w-full h-44
                             rounded-xl border-2 border-dashed border-slate-300 bg-slate-50
                             hover:bg-slate-100 hover:border-primary/50 transition-colors cursor-pointer overflow-hidden">
-              <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept="image/png, image/jpeg" />
-              <div className="flex flex-col items-center text-center px-4">
-                <FiUploadCloud className="w-8 h-8 text-slate-400 group-hover:text-primary transition-colors mb-2" />
-                <p className="text-sm font-medium text-text-heading">
-                  Upload Project Cover
-                </p>
-                <p className="text-xs text-text-muted mt-1">
-                  PNG, JPG up to 10MB
-                </p>
-              </div>
+              <input type="file" onChange={handleCoverChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept="image/png, image/jpeg" />
+              {coverPreview ? (
+                <img src={coverPreview} alt="Project cover preview" className="absolute inset-0 w-full h-full object-cover" />
+              ) : (
+                <div className="flex flex-col items-center text-center px-4">
+                  <FiUploadCloud className="w-8 h-8 text-slate-400 group-hover:text-primary transition-colors mb-2" />
+                  <p className="text-sm font-medium text-text-heading">
+                    Upload Project Cover
+                  </p>
+                  <p className="text-xs text-text-muted mt-1">
+                    PNG, JPG up to 10MB
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -70,6 +98,8 @@ export default function AddProjectPage() {
                 <input
                   type="text"
                   required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Skyline Heights"
                   className="w-full px-4 py-3 bg-white border border-border rounded-xl text-sm text-text-heading
                              placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary/20
@@ -84,6 +114,8 @@ export default function AddProjectPage() {
                 </label>
                 <input
                   type="text"
+                  value={reraNumber}
+                  onChange={(e) => setReraNumber(e.target.value)}
                   placeholder="e.g. P51900045872"
                   className="w-full px-4 py-3 bg-white border border-border rounded-xl text-sm text-text-heading
                              placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary/20
@@ -162,6 +194,8 @@ export default function AddProjectPage() {
                 </label>
                 <textarea
                   rows={3}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
                   placeholder="Enter a brief description of the project amenities and highlights..."
                   className="w-full px-4 py-3 bg-white border border-border rounded-xl text-sm text-text-heading
                              placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary/20

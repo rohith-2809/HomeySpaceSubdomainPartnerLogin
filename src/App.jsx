@@ -1,5 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import { OnboardingProvider } from "./context/OnboardingContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 import { ProjectProvider } from "./context/ProjectContext";
+import { ProjectSetupProvider } from "./context/ProjectSetupContext";
 import { AssignUnitProvider } from "./context/AssignUnitContext";
 import LoginPage                from "./pages/LoginPage";
 import CompanyProfilePage       from "./pages/CompanyProfilePage";
@@ -33,56 +37,63 @@ import AssignReviewPage         from "./pages/project/AssignReviewPage";
 import AssignCompletePage       from "./pages/project/AssignCompletePage";
 
 export default function App() {
+  const guard = (el) => <ProtectedRoute>{el}</ProtectedRoute>;
   return (
-    <ProjectProvider>
-      <AssignUnitProvider>
-        <BrowserRouter>
-          <Routes>
-            {/* ── Onboarding flow ── */}
-            <Route path="/"                          element={<LoginPage />} />
-            <Route path="/onboarding/company-profile" element={<CompanyProfilePage />} />
-            <Route path="/onboarding/basic-info"      element={<BasicInfoPage />} />
-            <Route path="/onboarding/review"          element={<ReviewConfirmPage />} />
+    <BrowserRouter>
+      <AuthProvider>
+        <OnboardingProvider>
+          <ProjectProvider>
+            <ProjectSetupProvider>
+            <AssignUnitProvider>
+              <Routes>
+                {/* ── Auth + onboarding flow ── */}
+                <Route path="/"                           element={<LoginPage />} />
+                <Route path="/onboarding/company-profile" element={guard(<CompanyProfilePage />)} />
+                <Route path="/onboarding/basic-info"      element={guard(<BasicInfoPage />)} />
+                <Route path="/onboarding/review"          element={guard(<ReviewConfirmPage />)} />
 
-            {/* ── Post-submission status screens ── */}
-            <Route path="/status/submitted" element={<ApplicationSubmittedPage />} />
-            <Route path="/status/pending"   element={<VerificationPendingPage />} />
-            <Route path="/status/verified"  element={<AccountVerifiedPage />} />
+                {/* ── Post-submission status screens ── */}
+                <Route path="/status/submitted" element={guard(<ApplicationSubmittedPage />)} />
+                <Route path="/status/pending"   element={guard(<VerificationPendingPage />)} />
+                <Route path="/status/verified"  element={guard(<AccountVerifiedPage />)} />
 
-            {/* ── Dashboard (Fully Authenticated) ── */}
-            <Route path="/dashboard"              element={<DashboardHomePage />} />
-            
-            {/* ── Under Construction Modules ── */}
-            <Route path="/team"                   element={<UnderConstructionPage />} />
-            <Route path="/sales"                  element={<UnderConstructionPage />} />
-            <Route path="/documents"              element={<UnderConstructionPage />} />
-            <Route path="/settings"               element={<UnderConstructionPage />} />
+                {/* ── Dashboard (Fully Authenticated) ── */}
+                <Route path="/dashboard"              element={guard(<DashboardHomePage />)} />
 
-            {/* ── Project Setup Flow ── */}
-            <Route path="/projects"               element={<ProjectsListPage />} />
-            <Route path="/projects/new"           element={<AddProjectPage />} />
-            <Route path="/projects/new/location"  element={<LocationDetailsPage />} />
-            <Route path="/projects/new/towers"    element={<TowersBlocksPage />} />
-            <Route path="/projects/new/units"     element={<UnitsSetupPage />} />
-            <Route path="/projects/new/review"    element={<ReviewSetupPage />} />
-            <Route path="/projects/new/complete"  element={<ProjectCompletePage />} />
+                {/* ── Under Construction Modules ── */}
+                <Route path="/team"                   element={guard(<UnderConstructionPage />)} />
+                <Route path="/sales"                  element={guard(<UnderConstructionPage />)} />
+                <Route path="/documents"              element={guard(<UnderConstructionPage />)} />
+                <Route path="/settings"               element={guard(<UnderConstructionPage />)} />
 
-            {/* ── Project Detail & Assign Flow ── */}
-            <Route path="/projects/:id"                      element={<ProjectDetailPage />} />
-            <Route path="/projects/:id/assign/tower"         element={<AssignUnitTowerPage />} />
-            <Route path="/projects/:id/assign/flat"          element={<AssignUnitFlatPage />} />
-            <Route path="/projects/:id/assign/unit-details"  element={<AssignUnitDetailsPage />} />
-            <Route path="/projects/:id/assign/buyer-details" element={<AssignBuyerDetailsPage />} />
-            <Route path="/projects/:id/assign/booking-details" element={<AssignBookingDetailsPage />} />
-            <Route path="/projects/:id/assign/review"        element={<AssignReviewPage />} />
-            <Route path="/projects/:id/assign/complete"      element={<AssignCompletePage />} />
+                {/* ── Project Setup Flow ── */}
+                <Route path="/projects"               element={guard(<ProjectsListPage />)} />
+                <Route path="/projects/new"           element={guard(<AddProjectPage />)} />
+                <Route path="/projects/new/location"  element={guard(<LocationDetailsPage />)} />
+                <Route path="/projects/new/towers"    element={guard(<TowersBlocksPage />)} />
+                <Route path="/projects/new/units"     element={guard(<UnitsSetupPage />)} />
+                <Route path="/projects/new/review"    element={guard(<ReviewSetupPage />)} />
+                <Route path="/projects/new/complete"  element={guard(<ProjectCompletePage />)} />
 
-            {/* ── Catch-all / 404 Redirects ── */}
-            <Route path="/index.html"             element={<Navigate to="/" replace />} />
-            <Route path="*"                       element={<Navigate to="/" replace />} />
-          </Routes>
-        </BrowserRouter>
-      </AssignUnitProvider>
-    </ProjectProvider>
+                {/* ── Project Detail & Assign Flow ── */}
+                <Route path="/projects/:id"                      element={guard(<ProjectDetailPage />)} />
+                <Route path="/projects/:id/assign/tower"         element={guard(<AssignUnitTowerPage />)} />
+                <Route path="/projects/:id/assign/flat"          element={guard(<AssignUnitFlatPage />)} />
+                <Route path="/projects/:id/assign/unit-details"  element={guard(<AssignUnitDetailsPage />)} />
+                <Route path="/projects/:id/assign/buyer-details" element={guard(<AssignBuyerDetailsPage />)} />
+                <Route path="/projects/:id/assign/booking-details" element={guard(<AssignBookingDetailsPage />)} />
+                <Route path="/projects/:id/assign/review"        element={guard(<AssignReviewPage />)} />
+                <Route path="/projects/:id/assign/complete"      element={guard(<AssignCompletePage />)} />
+
+                {/* ── Catch-all / 404 Redirects ── */}
+                <Route path="/index.html"             element={<Navigate to="/" replace />} />
+                <Route path="*"                       element={<Navigate to="/" replace />} />
+              </Routes>
+            </AssignUnitProvider>
+            </ProjectSetupProvider>
+          </ProjectProvider>
+        </OnboardingProvider>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
