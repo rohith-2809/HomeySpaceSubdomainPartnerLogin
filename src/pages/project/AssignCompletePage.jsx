@@ -1,16 +1,29 @@
+import { useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { FiCheck } from "react-icons/fi";
 import StatusLayout from "../../components/StatusLayout";
-import { useProjects } from "../../context/ProjectContext";
+import { useAssignUnit } from "../../context/AssignUnitContext";
 
 export default function AssignCompletePage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const location = useLocation();
-  const { getProject } = useProjects();
-  
-  const project = getProject(id);
-  const { buyerName, flat, tower } = location.state || { buyerName: "Rahul Sharma", flat: "105", tower: "Tower A" };
+  const { draftData, clearDraft } = useAssignUnit();
+
+  // Prefer navigate state (draft is cleared on mount); fall back to the draft.
+  const state = location.state || {};
+  const buyerName = state.buyerName || draftData.buyer?.fullName || "";
+  const flat = state.flat || draftData.flat;
+  const tower = state.tower || draftData.tower;
+
+  const flatNo = flat?.no ?? flat;
+  const towerName = tower?.name ?? tower;
+
+  // Clear the draft exactly once when the success screen mounts.
+  useEffect(() => {
+    clearDraft();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <StatusLayout>
@@ -31,7 +44,7 @@ export default function AssignCompletePage() {
 
         {/* ── Supporting text ── */}
         <p className="text-sm text-text-muted leading-relaxed mb-8 animate-fade-up delay-200">
-          The unit has been successfully assigned to the buyer for <strong>{project?.name || "the project"}</strong>.
+          The unit has been successfully assigned to the buyer{towerName ? <> for <strong>{towerName}</strong></> : ""}.
         </p>
 
         {/* ── Mini Summary Card ── */}
@@ -48,8 +61,8 @@ export default function AssignCompletePage() {
             {/* Unit Col */}
             <div>
               <h3 className="text-[11px] font-bold text-text-muted uppercase tracking-wider mb-2 border-b border-border pb-1">Unit</h3>
-              <p className="text-sm font-bold text-text-heading">Flat {flat}</p>
-              <p className="text-xs text-text-body mt-1">{tower}</p>
+              <p className="text-sm font-bold text-text-heading">Flat {flatNo}</p>
+              <p className="text-xs text-text-body mt-1">{towerName}</p>
             </div>
 
           </div>

@@ -1,12 +1,23 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiArrowLeft, FiMapPin, FiChevronDown, FiArrowRight } from "react-icons/fi";
 import DashboardLayout from "../../components/DashboardLayout";
+import { useProjectSetup } from "../../context/ProjectSetupContext";
 
 export default function LocationDetailsPage() {
   const navigate = useNavigate();
+  const { data, patch } = useProjectSetup();
+
+  const [streetAddress, setStreetAddress] = useState(data.streetAddress || "");
+  const [locality, setLocality] = useState(data.locality || "");
+  const [landmark, setLandmark] = useState(data.landmark || "");
+  const [pincode, setPincode] = useState(data.pincode || "");
+  const [city, setCity] = useState(data.city || "");
+  const [state, setState] = useState(data.state || "");
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    patch({ streetAddress, locality, landmark, pincode, city, state });
     navigate("/projects/new/towers");
   };
 
@@ -60,6 +71,8 @@ export default function LocationDetailsPage() {
                 <textarea
                   required
                   rows={2}
+                  value={streetAddress}
+                  onChange={(e) => setStreetAddress(e.target.value)}
                   placeholder="Enter full street address or survey number..."
                   className="w-full px-4 py-3 bg-white border border-border rounded-xl text-sm text-text-heading
                              placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary/20
@@ -75,6 +88,8 @@ export default function LocationDetailsPage() {
                 <input
                   type="text"
                   required
+                  value={locality}
+                  onChange={(e) => setLocality(e.target.value)}
                   placeholder="e.g. Bandra West"
                   className="w-full px-4 py-3 bg-white border border-border rounded-xl text-sm text-text-heading
                              placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary/20
@@ -89,6 +104,8 @@ export default function LocationDetailsPage() {
                 </label>
                 <input
                   type="text"
+                  value={landmark}
+                  onChange={(e) => setLandmark(e.target.value)}
                   placeholder="e.g. Near Metro Station"
                   className="w-full px-4 py-3 bg-white border border-border rounded-xl text-sm text-text-heading
                              placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary/20
@@ -104,6 +121,8 @@ export default function LocationDetailsPage() {
                 <input
                   type="text"
                   required
+                  value={pincode}
+                  onChange={(e) => setPincode(e.target.value)}
                   placeholder="e.g. 400050"
                   className="w-full px-4 py-3 bg-white border border-border rounded-xl text-sm text-text-heading
                              placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary/20
@@ -119,6 +138,8 @@ export default function LocationDetailsPage() {
                 <input
                   type="text"
                   required
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
                   placeholder="e.g. Mumbai"
                   className="w-full px-4 py-3 bg-white border border-border rounded-xl text-sm text-text-heading
                              placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary/20
@@ -134,11 +155,13 @@ export default function LocationDetailsPage() {
                 <div className="relative">
                   <select
                     required
+                    value={state}
+                    onChange={(e) => setState(e.target.value)}
                     className="w-full px-4 py-3 bg-white border border-border rounded-xl text-sm text-text-heading
                                appearance-none focus:outline-none focus:ring-2 focus:ring-primary/20
                                focus:border-primary transition-all cursor-pointer"
                   >
-                    <option value="" disabled selected>Select state / UT</option>
+                    <option value="" disabled>Select state / UT</option>
                     <option value="AP">Andhra Pradesh</option>
                     <option value="AR">Arunachal Pradesh</option>
                     <option value="AS">Assam</option>

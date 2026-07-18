@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiClock, FiCheck, FiLock } from "react-icons/fi";
 import DashboardLayout from "../components/DashboardLayout";
+import { useAuth } from "../context/AuthContext";
 
 /* ─── Application status steps ─── */
 const STATUS_STEPS = [
@@ -29,9 +31,28 @@ const STATUS_STEPS = [
 /* ═══════════════════════════════════════════════════════════ */
 export default function VerificationPendingPage() {
   const navigate = useNavigate();
+  const { partner, refreshStatus } = useAuth();
+
+  // On mount, refresh status immediately, then poll every 15s until verified.
+  useEffect(() => {
+    let interval;
+
+    const check = async () => {
+      const s = await refreshStatus();
+      if (s?.application_status === "verified") {
+        clearInterval(interval);
+        navigate("/status/verified");
+      }
+    };
+
+    check();
+    interval = setInterval(check, 15000);
+
+    return () => clearInterval(interval);
+  }, [refreshStatus, navigate]);
 
   return (
-    <DashboardLayout partnerName="Skyline">
+    <DashboardLayout partnerName={partner?.business_name || "Skyline"}>
       <div className="max-w-2xl mx-auto lg:mx-0 space-y-5">
 
         {/* ── Verification Pending card ── */}

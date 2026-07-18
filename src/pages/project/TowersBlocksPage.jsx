@@ -2,14 +2,24 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiArrowLeft, FiMoreVertical, FiPlus, FiArrowRight, FiTrash2 } from "react-icons/fi";
 import DashboardLayout from "../../components/DashboardLayout";
+import { useProjectSetup } from "../../context/ProjectSetupContext";
 
 export default function TowersBlocksPage() {
   const navigate = useNavigate();
+  const { data, patch } = useProjectSetup();
 
   // State to hold the repeatable towers
-  const [towers, setTowers] = useState([
-    { id: 1, name: "", floors: "", unitsPerFloor: "" }
-  ]);
+  const [towers, setTowers] = useState(() => {
+    if (data.towers && data.towers.length > 0) {
+      return data.towers.map((t, i) => ({
+        id: i + 1,
+        name: t.name || "",
+        floors: t.floors ?? "",
+        unitsPerFloor: t.unitsPerFloor ?? "",
+      }));
+    }
+    return [{ id: 1, name: "", floors: "", unitsPerFloor: "" }];
+  });
 
   const handleAddTower = () => {
     setTowers([...towers, { id: Date.now(), name: "", floors: "", unitsPerFloor: "" }]);
@@ -27,6 +37,9 @@ export default function TowersBlocksPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    patch({
+      towers: towers.map(({ name, floors, unitsPerFloor }) => ({ name, floors, unitsPerFloor })),
+    });
     navigate("/projects/new/units");
   };
 

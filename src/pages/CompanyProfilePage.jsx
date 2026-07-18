@@ -8,6 +8,7 @@ import {
   FiChevronDown,
 } from "react-icons/fi";
 import OnboardingLayout from "../components/OnboardingLayout";
+import { useOnboarding } from "../context/OnboardingContext";
 
 /* ─── City options for dropdown ─── */
 const CITIES = [
@@ -33,32 +34,30 @@ const CITIES = [
 /* ═══════════════════════════════════════════════ */
 export default function CompanyProfilePage() {
   const navigate = useNavigate();
+  const { data, setProfile } = useOnboarding();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [logoPreview, setLogoPreview] = useState(null);
 
-  // Form state
-  const [experience, setExperience] = useState("");
-  const [projectsCompleted, setProjectsCompleted] = useState("");
-  const [city, setCity] = useState("");
+  // Form state — initialized from onboarding context so values persist on back-nav.
+  const [experience, setExperience] = useState(data.profile.experience);
+  const [projectsCompleted, setProjectsCompleted] = useState(data.profile.projectsCompleted);
+  const [city, setCity] = useState(data.profile.city);
+  const [logoPreview, setLogoPreview] = useState(data.profile.logoPreview);
   const [isCityOpen, setIsCityOpen] = useState(false);
 
   const handleLogoUpload = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => setLogoPreview(reader.result);
-      reader.readAsDataURL(file);
+      const preview = URL.createObjectURL(file);
+      setLogoPreview(preview);
+      setProfile({ logo: file, logoPreview: preview });
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate save
-    setTimeout(() => {
-      setIsSubmitting(false);
-      navigate("/onboarding/basic-info");
-    }, 1200);
+    // No API call here — data is accumulated in onboarding context and submitted at review.
+    navigate("/onboarding/basic-info");
   };
 
   return (
@@ -136,7 +135,10 @@ export default function CompanyProfilePage() {
                 required
                 placeholder="e.g. 12 years"
                 value={experience}
-                onChange={(e) => setExperience(e.target.value)}
+                onChange={(e) => {
+                  setExperience(e.target.value);
+                  setProfile({ experience: e.target.value });
+                }}
                 className="w-full pl-11 pr-4 py-3 rounded-xl bg-surface-input border border-border
                            text-sm text-text-heading placeholder:text-text-placeholder
                            hover:border-slate-300 focus:outline-none focus:ring-4 focus:ring-primary/8 focus:border-border-focus
@@ -162,7 +164,10 @@ export default function CompanyProfilePage() {
                 required
                 placeholder="e.g. 25"
                 value={projectsCompleted}
-                onChange={(e) => setProjectsCompleted(e.target.value)}
+                onChange={(e) => {
+                  setProjectsCompleted(e.target.value);
+                  setProfile({ projectsCompleted: e.target.value });
+                }}
                 className="w-full pl-11 pr-4 py-3 rounded-xl bg-surface-input border border-border
                            text-sm text-text-heading placeholder:text-text-placeholder
                            hover:border-slate-300 focus:outline-none focus:ring-4 focus:ring-primary/8 focus:border-border-focus
@@ -213,6 +218,7 @@ export default function CompanyProfilePage() {
                       type="button"
                       onClick={() => {
                         setCity(c);
+                        setProfile({ city: c });
                         setIsCityOpen(false);
                       }}
                       className={`w-full text-left px-4 py-2.5 text-sm transition-colors duration-150 cursor-pointer

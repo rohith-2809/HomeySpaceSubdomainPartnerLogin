@@ -1,6 +1,7 @@
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { 
-  FiMapPin, 
+import {
+  FiMapPin,
   FiArrowLeft,
   FiUserPlus,
   FiUsers,
@@ -10,17 +11,87 @@ import {
   FiFileText
 } from "react-icons/fi";
 import DashboardLayout from "../../components/DashboardLayout";
-import { useProjects } from "../../context/ProjectContext";
+import { api, mediaUrl } from "../../api/client";
+
+const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 
 export default function ProjectDetailPage() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { getProject } = useProjects();
-  const project = getProject(id);
 
-  if (!project) return <div>Project not found</div>;
+  const [project, setProject] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+  const [error, setError] = useState(null);
 
-  const salesPercentage = project.totalUnits > 0 ? Math.round((project.soldUnits / project.totalUnits) * 100) : 0;
+  useEffect(() => {
+    let alive = true;
+    setLoading(true);
+    setNotFound(false);
+    setError(null);
+    api
+      .get(`/partner/builder-projects/${id}/`)
+      .then((data) => { if (alive) setProject(data); })
+      .catch((e) => {
+        if (!alive) return;
+        if (e.status === 404) setNotFound(true);
+        else setError(e);
+      })
+      .finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
+  }, [id]);
+
+  if (loading) {
+    return (
+      <DashboardLayout activeNav="Projects" locked={false} topBarTitle="Project" topBarSubtitle="Project Hub">
+        <div className="max-w-4xl mx-auto animate-fade-in space-y-6">
+          <div className="h-4 w-32 bg-slate-100 rounded animate-pulse" />
+          <div className="bg-white rounded-2xl border border-border overflow-hidden shadow-sm">
+            <div className="h-40 bg-slate-200 animate-pulse" />
+            <div className="p-5 sm:p-6 space-y-4">
+              <div className="h-7 w-1/2 bg-slate-200 rounded animate-pulse" />
+              <div className="h-4 w-1/3 bg-slate-100 rounded animate-pulse" />
+              <div className="h-20 w-full bg-slate-50 rounded-xl border border-border animate-pulse" />
+            </div>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (notFound || !project) {
+    return (
+      <DashboardLayout activeNav="Projects" locked={false} topBarTitle="Project" topBarSubtitle="Project Hub">
+        <div className="max-w-4xl mx-auto animate-fade-in">
+          <button
+            onClick={() => navigate("/projects")}
+            className="flex items-center gap-2 text-sm font-semibold text-text-muted hover:text-text-heading transition-colors mb-6"
+          >
+            <FiArrowLeft className="w-4 h-4" />
+            Back to Projects
+          </button>
+          <div className="bg-white rounded-2xl border border-dashed border-border py-20 px-6 flex flex-col items-center text-center">
+            <h3 className="text-base font-semibold text-text-heading mb-1.5">
+              {error ? "Couldn't load project" : "Project not found"}
+            </h3>
+            <p className="text-sm text-text-muted max-w-sm">
+              {error?.message || "This project may have been removed or you don't have access to it."}
+            </p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  const cover = mediaUrl(project.cover_image);
+  const towers = project.towers || [];
+  const configs = project.unit_configurations || [];
+  const salesPercentage =
+    project.progress != null
+      ? project.progress
+      : project.total_units > 0
+      ? Math.round((project.sold_units / project.total_units) * 100)
+      : 0;
 
   return (
     <DashboardLayout
@@ -43,9 +114,15 @@ export default function ProjectDetailPage() {
         {/* ── Project Header ── */}
         <div className="bg-white rounded-2xl border border-border overflow-hidden shadow-sm">
           <div className="relative h-40 bg-slate-200">
-            <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80" alt="Cover" className="w-full h-full object-cover" />
+            {cover ? (
+              <img src={cover} alt="Cover" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <FiGrid className="w-8 h-8 text-slate-300" />
+              </div>
+            )}
             <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-md text-[10px] font-bold text-text-heading tracking-wider uppercase shadow-sm">
-              Active
+              {cap(project.status)}
             </div>
           </div>
           
@@ -60,11 +137,11 @@ export default function ProjectDetailPage() {
             <div className="bg-slate-50 rounded-xl p-4 border border-border">
               <div className="flex items-center justify-between mb-3 text-sm">
                 <div>
-                  <span className="font-bold text-text-heading">{project.totalUnits}</span> <span className="text-text-muted">Total Units</span>
+                  <span className="font-bold text-text-heading">{project.total_units ?? 0}</span> <span className="text-text-muted">Total Units</span>
                 </div>
                 <div className="flex gap-4">
-                  <div><span className="font-bold text-amber-500">{project.soldUnits}</span> <span className="text-text-muted">Sold</span></div>
-                  <div><span className="font-bold text-primary">{project.availableUnits}</span> <span className="text-text-muted">Available</span></div>
+                  <div><span className="font-bold text-amber-500">{project.sold_units ?? 0}</span> <span className="text-text-muted">Sold</span></div>
+                  <div><span className="font-bold text-primary">{project.available_units ?? 0}</span> <span className="text-text-muted">Available</span></div>
                 </div>
               </div>
               
@@ -120,7 +197,11 @@ export default function ProjectDetailPage() {
                 <FiGrid className="w-4 h-4 text-primary" />
                 <h3 className="text-sm font-bold text-text-heading">Towers Overview</h3>
               </div>
-              <p className="text-xs text-text-muted">1 Tower · Configured blocks</p>
+              <p className="text-xs text-text-muted">
+                {towers.length === 0
+                  ? "No towers yet"
+                  : `${towers.length} ${towers.length === 1 ? "Tower" : "Towers"} · ${towers.map((t) => t.name).filter(Boolean).join(", ") || "Configured blocks"}`}
+              </p>
             </div>
             <button className="text-xs font-semibold text-primary hover:text-primary-hover cursor-pointer">Manage</button>
           </div>
@@ -131,7 +212,11 @@ export default function ProjectDetailPage() {
                 <FiGrid className="w-4 h-4 text-primary" />
                 <h3 className="text-sm font-bold text-text-heading">Floor Plans</h3>
               </div>
-              <p className="text-xs text-text-muted">1 Plan available</p>
+              <p className="text-xs text-text-muted">
+                {configs.length === 0
+                  ? "No plans yet"
+                  : `${configs.length} ${configs.length === 1 ? "Plan" : "Plans"} available`}
+              </p>
             </div>
             <button className="text-xs font-semibold text-primary hover:text-primary-hover cursor-pointer">View</button>
           </div>

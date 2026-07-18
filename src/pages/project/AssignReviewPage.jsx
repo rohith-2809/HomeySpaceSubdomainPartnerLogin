@@ -1,26 +1,37 @@
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FiArrowLeft, FiCheck } from "react-icons/fi";
 import DashboardLayout from "../../components/DashboardLayout";
 import { useAssignUnit } from "../../context/AssignUnitContext";
-import { useProjects } from "../../context/ProjectContext";
 
 export default function AssignReviewPage() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { draftData, clearDraft } = useAssignUnit();
-  const { assignUnit } = useProjects();
+  const { draftData, submitAssignment } = useAssignUnit();
+
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   if (!draftData.flat) return <div>Invalid selection</div>;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Commit the draft data to the mock project database
-    assignUnit(id, draftData.tower.id, draftData.flat.id);
-    
-    // Save buyer name temporarily for the complete page via query param or just let it pass,
-    // Since we clear draft, we should probably pass it in state
-    navigate(`/projects/${id}/assign/complete`, { state: { buyerName: draftData.buyer.fullName, flat: draftData.flat.no, tower: draftData.tower.name }});
-    clearDraft();
+    if (submitting) return;
+    setSubmitting(true);
+    setError("");
+    try {
+      await submitAssignment();
+      navigate(`/projects/${id}/assign/complete`, {
+        state: {
+          buyerName: draftData.buyer.fullName,
+          flat: draftData.flat,
+          tower: draftData.tower,
+        },
+      });
+    } catch (err) {
+      setError(err.message || "Failed to assign unit. Please try again.");
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -144,18 +155,26 @@ export default function AssignReviewPage() {
           </div>
 
           <div className="flex flex-col gap-4 mt-6">
+            {error && (
+              <div className="w-full rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                {error}
+              </div>
+            )}
             <button
               type="submit"
+              disabled={submitting}
               className="w-full flex items-center justify-center py-3.5 px-6
                          rounded-xl bg-primary text-white text-sm font-semibold
                          hover:bg-primary-hover hover:-translate-y-px active:translate-y-0 active:scale-[0.99]
                          shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/25
-                         transition-all duration-300 cursor-pointer"
+                         transition-all duration-300 cursor-pointer
+                         disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
             >
-              Confirm & Assign Unit
+              {submitting ? "Assigning…" : "Confirm & Assign Unit"}
             </button>
             <button
               type="button"
+              disabled={submitting}
               onClick={() => navigate(`/projects/${id}/assign/booking-details`)}
               className="w-full flex items-center justify-center py-3.5 px-6
                          rounded-xl bg-transparent border border-border text-text-body text-sm font-semibold

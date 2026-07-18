@@ -1,18 +1,38 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { 
-  FiFolderPlus, 
-  FiUsers, 
-  FiTrendingUp, 
+import {
+  FiFolderPlus,
+  FiUsers,
+  FiTrendingUp,
   FiFileText,
   FiCheck
 } from "react-icons/fi";
 import DashboardLayout from "../components/DashboardLayout";
+import { api } from "../api/client";
+import { useAuth } from "../context/AuthContext";
 
 export default function DashboardHomePage() {
   const navigate = useNavigate();
+  const { partner } = useAuth();
 
-  // Mock partner data
-  const partnerName = "Vasavi Group";
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let alive = true;
+    setLoading(true);
+    api
+      .get("/partner/stats/")
+      .then((data) => { if (alive) setStats(data); })
+      .catch(() => { if (alive) setStats(null); })
+      .finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
+  }, []);
+
+  const partnerName = stats?.business_name || partner?.business_name || "Partner";
+
+  // Show a dash while loading, otherwise the real value (falling back to 0).
+  const statValue = (v) => (loading ? "—" : v ?? 0);
 
   return (
     <DashboardLayout
@@ -73,7 +93,7 @@ export default function DashboardHomePage() {
             </div>
             <div className="pt-0.5">
               <h3 className="text-base font-bold text-text-heading mb-0.5">Projects</h3>
-              <p className="text-sm text-text-muted">12 Active Projects</p>
+              <p className="text-sm text-text-muted">{statValue(stats?.active_projects)} Active Projects</p>
             </div>
           </button>
 
@@ -150,28 +170,32 @@ export default function DashboardHomePage() {
               <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5">
                 New Leads
               </p>
-              <p className="text-2xl font-bold text-text-heading">24</p>
+              <p className="text-2xl font-bold text-text-heading">{statValue(stats?.new_leads)}</p>
             </div>
 
             <div className="bg-white rounded-2xl border border-border shadow-sm p-5">
               <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5">
                 New Bookings
               </p>
-              <p className="text-2xl font-bold text-text-heading">3</p>
+              <p className="text-2xl font-bold text-text-heading">{statValue(stats?.new_bookings)}</p>
             </div>
 
             <div className="bg-white rounded-2xl border border-border shadow-sm p-5">
               <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5">
                 Approvals Pending
               </p>
-              <p className="text-2xl font-bold text-text-heading">8</p>
+              <p className="text-2xl font-bold text-text-heading">{statValue(stats?.approvals_pending)}</p>
             </div>
 
             <div className="bg-white rounded-2xl border border-border shadow-sm p-5">
               <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1.5">
                 Amount Collected
               </p>
-              <p className="text-2xl font-bold text-text-heading">₹1.2 <span className="text-lg text-text-muted font-semibold">Cr</span></p>
+              <p className="text-2xl font-bold text-text-heading">
+                {loading
+                  ? "—"
+                  : `₹${Number(stats?.amount_collected ?? 0).toLocaleString("en-IN")}`}
+              </p>
             </div>
 
           </div>
