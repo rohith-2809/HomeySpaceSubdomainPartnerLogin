@@ -7,14 +7,14 @@ import {
   FiMail,
   FiLock,
   FiArrowRight,
+  FiArrowLeft,
   FiCheck,
+  FiKey,
   FiGrid,
   FiBarChart2,
   FiUsers,
   FiLayers,
 } from "react-icons/fi";
-import { FcGoogle } from "react-icons/fc";
-import { FaApple } from "react-icons/fa";
 
 /* ─── Helper to render the logo without its white background ─── */
 function TransparentLogo({ src, color = "original", className, alt = "HomeySpace" }) {
@@ -78,7 +78,11 @@ function TransparentLogo({ src, color = "original", className, alt = "HomeySpace
 /* ═══════════════════════════════════════════════ */
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { loginOrSignup } = useAuth();
+  const { loginOrSignup, requestOtp, verifyOtp } = useAuth();
+  const [mode, setMode] = useState("password");   // "password" | "otp"
+  const [otpStep, setOtpStep] = useState("email"); // "email" | "code"
+  const [otpCode, setOtpCode] = useState("");
+  const [info, setInfo] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -86,17 +90,50 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const goByStatus = (data) => {
+    const status = data.application_status || data.partner?.application_status || "draft";
+    navigate(routeForStatus(status));
+  };
+
+  const switchMode = (m) => {
+    setMode(m); setError(""); setInfo(""); setOtpStep("email"); setOtpCode("");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setIsLoading(true);
+    setError(""); setIsLoading(true);
     try {
       // Existing partner -> logs in; new email -> creates the account.
       const data = await loginOrSignup(email.trim(), password);
-      const status = data.application_status || data.partner?.application_status || "draft";
-      navigate(routeForStatus(status));
+      goByStatus(data);
     } catch (err) {
       setError(err.message || "Unable to sign in. Please try again.");
+      setIsLoading(false);
+    }
+  };
+
+  const handleSendOtp = async (e) => {
+    e.preventDefault();
+    setError(""); setInfo(""); setIsLoading(true);
+    try {
+      await requestOtp(email);
+      setOtpStep("code");
+      setInfo(`We sent a 6-digit code to ${email.trim()}.`);
+      setIsLoading(false);
+    } catch (err) {
+      setError(err.message || "Couldn't send the code. Please try again.");
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    setError(""); setIsLoading(true);
+    try {
+      const data = await verifyOtp(email, otpCode);
+      goByStatus(data);
+    } catch (err) {
+      setError(err.message || "Invalid or expired code.");
       setIsLoading(false);
     }
   };
@@ -201,44 +238,26 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* ─── Social login buttons ─── */}
-          <div className="grid grid-cols-2 gap-3">
+          {/* ─── Method toggle: Password | One-time code ─── */}
+          <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-surface-input border border-border">
             <button
-              id="btn-google-login"
               type="button"
-              className="group flex items-center justify-center gap-2.5 w-full px-4 py-3 rounded-xl
-                         bg-white border border-border text-sm font-medium text-text-body
-                         hover:border-slate-300 hover:bg-slate-50/50 hover:-translate-y-px
-                         active:translate-y-0 active:scale-[0.98]
-                         transition-all duration-300 cubic-bezier(0.16, 1, 0.3, 1) cursor-pointer"
+              onClick={() => switchMode("password")}
+              className={`py-2 rounded-lg text-sm font-medium transition-all duration-200 ${mode === "password" ? "bg-white text-text-heading shadow-sm" : "text-text-muted hover:text-text-body"}`}
             >
-              <FcGoogle className="w-5 h-5 group-hover:scale-105 transition-transform duration-300" />
-              <span>Google</span>
+              Password
             </button>
             <button
-              id="btn-apple-login"
               type="button"
-              className="group flex items-center justify-center gap-2.5 w-full px-4 py-3 rounded-xl
-                         bg-white border border-border text-sm font-medium text-text-body
-                         hover:border-slate-300 hover:bg-slate-50/50 hover:-translate-y-px
-                         active:translate-y-0 active:scale-[0.98]
-                         transition-all duration-300 cubic-bezier(0.16, 1, 0.3, 1) cursor-pointer"
+              onClick={() => switchMode("otp")}
+              className={`py-2 rounded-lg text-sm font-medium transition-all duration-200 ${mode === "otp" ? "bg-white text-text-heading shadow-sm" : "text-text-muted hover:text-text-body"}`}
             >
-              <FaApple className="w-5 h-5 group-hover:scale-105 transition-transform duration-300" />
-              <span>Apple</span>
+              One-time code
             </button>
           </div>
 
-          {/* ─── Divider ─── */}
-          <div className="flex items-center gap-4">
-            <div className="flex-1 h-px bg-border" />
-            <span className="text-xs font-medium text-text-placeholder uppercase tracking-widest">
-              or continue with email
-            </span>
-            <div className="flex-1 h-px bg-border" />
-          </div>
-
-          {/* ─── Login form ─── */}
+          {/* ─── Password login ─── */}
+          {mode === "password" && (
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email */}
             <div className="space-y-1.5">
@@ -381,17 +400,138 @@ export default function LoginPage() {
               )}
             </button>
           </form>
+          )}
+
+          {/* ─── One-time code (OTP) login ─── */}
+          {mode === "otp" && (
+          <form onSubmit={otpStep === "email" ? handleSendOtp : handleVerifyOtp} className="space-y-5">
+            {/* Email */}
+            <div className="space-y-1.5">
+              <label htmlFor="otp-email" className="block text-xs font-semibold text-text-body uppercase tracking-wider">
+                Email address
+              </label>
+              <div className="relative group">
+                <FiMail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-text-placeholder group-focus-within:text-primary transition-colors duration-300 pointer-events-none" />
+                <input
+                  id="otp-email"
+                  name="otp-email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  placeholder="you@company.com"
+                  value={email}
+                  disabled={otpStep === "code"}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-surface-input border border-border
+                             text-sm text-text-heading placeholder:text-text-placeholder disabled:opacity-60
+                             hover:border-slate-300 focus:outline-none focus:ring-4 focus:ring-primary/8 focus:border-border-focus
+                             transition-all duration-300 cubic-bezier(0.16, 1, 0.3, 1)"
+                />
+              </div>
+            </div>
+
+            {/* Code (step 2) */}
+            {otpStep === "code" && (
+              <div className="space-y-1.5">
+                <label htmlFor="otp-code" className="block text-xs font-semibold text-text-body uppercase tracking-wider">
+                  6-digit code
+                </label>
+                <div className="relative group">
+                  <FiKey className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-text-placeholder group-focus-within:text-primary transition-colors duration-300 pointer-events-none" />
+                  <input
+                    id="otp-code"
+                    name="otp-code"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    required
+                    maxLength={6}
+                    placeholder="••••••"
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                    className="w-full pl-11 pr-4 py-3 rounded-xl bg-surface-input border border-border tracking-[0.4em] font-semibold
+                               text-sm text-text-heading placeholder:text-text-placeholder placeholder:tracking-[0.2em]
+                               hover:border-slate-300 focus:outline-none focus:ring-4 focus:ring-primary/8 focus:border-border-focus
+                               transition-all duration-300 cubic-bezier(0.16, 1, 0.3, 1)"
+                  />
+                </div>
+                <div className="flex items-center justify-between pt-1">
+                  <button type="button" onClick={() => { setOtpStep("email"); setInfo(""); setOtpCode(""); setError(""); }}
+                    className="text-xs font-medium text-text-muted hover:text-text-body transition-colors">
+                    Change email
+                  </button>
+                  <button type="button" onClick={handleSendOtp} disabled={isLoading}
+                    className="text-xs font-medium text-primary hover:text-primary-hover hover:underline transition-colors disabled:opacity-60">
+                    Resend code
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Info + Error */}
+            {info && (
+              <div className="rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-700">
+                {info}
+              </div>
+            )}
+            {error && (
+              <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+                {error}
+              </div>
+            )}
+
+            {/* Submit */}
+            <button
+              id="btn-otp-submit"
+              type="submit"
+              disabled={isLoading}
+              className="group relative w-full flex items-center justify-center gap-2 py-3.5 px-6
+                         rounded-xl bg-primary text-white text-sm font-semibold
+                         hover:bg-primary-hover hover:-translate-y-px active:translate-y-0 active:scale-[0.99]
+                         disabled:opacity-70 disabled:cursor-not-allowed
+                         shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/25
+                         transition-all duration-300 cubic-bezier(0.16, 1, 0.3, 1) cursor-pointer"
+            >
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <svg className="animate-spin w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  <span>Please wait...</span>
+                </div>
+              ) : otpStep === "email" ? (
+                <>
+                  <span>Send code</span>
+                  <FiArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-300" />
+                </>
+              ) : (
+                <>
+                  <span>Verify &amp; sign in</span>
+                  <FiArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-300" />
+                </>
+              )}
+            </button>
+
+            {otpStep === "email" && (
+              <button type="button" onClick={() => switchMode("password")}
+                className="w-full flex items-center justify-center gap-1.5 text-sm font-medium text-text-muted hover:text-text-body transition-colors">
+                <FiArrowLeft className="w-4 h-4" /> Sign in with password instead
+              </button>
+            )}
+          </form>
+          )}
 
           {/* ─── Footer ─── */}
           <p className="text-center text-sm text-text-muted">
             Don't have an account?{" "}
-            <a
-              href="#"
+            <button
+              type="button"
               id="link-signup"
+              onClick={() => switchMode("otp")}
               className="font-semibold text-primary hover:text-primary-hover hover:underline transition-colors duration-200"
             >
-              Request access
-            </a>
+              Sign up with a one-time code
+            </button>
           </p>
         </div>
       </div>

@@ -38,6 +38,16 @@ export function AuthProvider({ children }) {
     return applyAuth(data);
   }, []);
 
+  // Passwordless OTP login: request a one-time email code, then verify it.
+  const requestOtp = useCallback(async (email) => {
+    return api.post("/auth/partner/otp/request/", { email: email.trim() }, { auth: false });
+  }, []);
+
+  const verifyOtp = useCallback(async (email, code) => {
+    const data = await api.post("/auth/partner/otp/verify/", { email: email.trim(), code: String(code).trim() }, { auth: false });
+    return applyAuth(data);
+  }, []);
+
   // Log in; if the account doesn't exist yet, create it, then continue.
   const loginOrSignup = useCallback(async (email, password) => {
     try {
@@ -82,7 +92,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ partner, status, token, loading, isAuthed: !!token, login, signup, loginOrSignup, refreshStatus, logout, setStatus, setPartner }}
+      value={{ partner, status, token, loading, isAuthed: !!token, login, signup, requestOtp, verifyOtp, loginOrSignup, refreshStatus, logout, setStatus, setPartner }}
     >
       {children}
     </AuthContext.Provider>
