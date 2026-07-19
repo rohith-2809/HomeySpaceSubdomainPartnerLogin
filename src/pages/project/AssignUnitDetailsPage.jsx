@@ -55,22 +55,31 @@ export default function AssignUnitDetailsPage() {
                 BHK Type
               </label>
               <div className="flex flex-wrap gap-3">
-                {["1 BHK", "2 BHK", "3 BHK", "4 BHK", "5+ BHK"].map((type) => (
-                  <label key={type} className="cursor-pointer relative">
-                    <input 
-                      type="radio" 
-                      name="bhkType" 
-                      className="peer sr-only" 
-                      checked={draftData.flat.type === type}
-                      onChange={() => handleBhkChange(type)}
-                    />
-                    <div className="px-4 py-2.5 rounded-xl border border-border text-sm font-medium text-text-body
-                                    peer-checked:border-primary peer-checked:bg-primary/5 peer-checked:text-primary
-                                    hover:bg-slate-50 transition-all">
-                      {type}
-                    </div>
-                  </label>
-                ))}
+                {["1 BHK", "2 BHK", "3 BHK", "4 BHK", "5+ BHK"].map((type) => {
+                  const isSelected = draftData.flat.type === type;
+                  return (
+                    <label key={type} className="cursor-pointer relative">
+                      <input 
+                        type="radio" 
+                        name="bhkType" 
+                        className="sr-only" 
+                        checked={isSelected}
+                        onChange={() => handleBhkChange(type)}
+                      />
+                      <div className={`
+                        flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-semibold transition-all duration-300 ease-out
+                        ${isSelected 
+                          ? 'bg-primary border-primary text-white shadow-md shadow-primary/30 scale-[0.98]'
+                          : 'bg-white border-border text-text-body hover:border-primary/40 hover:shadow-sm hover:bg-slate-50 hover:-translate-y-0.5'}
+                      `}>
+                        <div className={`overflow-hidden transition-all duration-300 ease-out flex items-center justify-center ${isSelected ? 'w-4 opacity-100' : 'w-0 opacity-0'}`}>
+                          <FiCheck className="w-4 h-4 shrink-0" />
+                        </div>
+                        <span>{type}</span>
+                      </div>
+                    </label>
+                  );
+                })}
               </div>
             </div>
 
@@ -80,22 +89,31 @@ export default function AssignUnitDetailsPage() {
                 Unit Size
               </label>
               <div className="flex flex-wrap gap-3">
-                {["1,250 sq.ft", "1,450 sq.ft", "1,800 sq.ft"].map((size) => (
-                  <label key={size} className="cursor-pointer relative">
-                    <input 
-                      type="radio" 
-                      name="unitSize" 
-                      className="peer sr-only" 
-                      checked={draftData.flat.size === size}
-                      onChange={() => handleSizeChange(size)}
-                    />
-                    <div className="px-4 py-2.5 rounded-xl border border-border text-sm font-medium text-text-body
-                                    peer-checked:border-primary peer-checked:bg-primary/5 peer-checked:text-primary
-                                    hover:bg-slate-50 transition-all">
-                      {size}
-                    </div>
-                  </label>
-                ))}
+                {["1,250 sq.ft", "1,450 sq.ft", "1,800 sq.ft"].map((size) => {
+                  const isSelected = draftData.flat.size === size;
+                  return (
+                    <label key={size} className="cursor-pointer relative">
+                      <input 
+                        type="radio" 
+                        name="unitSize" 
+                        className="sr-only" 
+                        checked={isSelected}
+                        onChange={() => handleSizeChange(size)}
+                      />
+                      <div className={`
+                        flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-semibold transition-all duration-300 ease-out
+                        ${isSelected 
+                          ? 'bg-primary border-primary text-white shadow-md shadow-primary/30 scale-[0.98]'
+                          : 'bg-white border-border text-text-body hover:border-primary/40 hover:shadow-sm hover:bg-slate-50 hover:-translate-y-0.5'}
+                      `}>
+                        <div className={`overflow-hidden transition-all duration-300 ease-out flex items-center justify-center ${isSelected ? 'w-4 opacity-100' : 'w-0 opacity-0'}`}>
+                          <FiCheck className="w-4 h-4 shrink-0" />
+                        </div>
+                        <span>{size}</span>
+                      </div>
+                    </label>
+                  );
+                })}
               </div>
             </div>
 
@@ -105,22 +123,31 @@ export default function AssignUnitDetailsPage() {
                 Facing
               </label>
               <div className="flex flex-wrap gap-3">
-                {["North", "East", "South", "West"].map((facing) => (
-                  <label key={facing} className="cursor-pointer relative">
-                    <input 
-                      type="radio" 
-                      name="facing" 
-                      className="peer sr-only" 
-                      checked={draftData.flat.facing === facing}
-                      onChange={() => handleFacingChange(facing)}
-                    />
-                    <div className="px-4 py-2.5 rounded-xl border border-border text-sm font-medium text-text-body
-                                    peer-checked:border-primary peer-checked:bg-primary/5 peer-checked:text-primary
-                                    hover:bg-slate-50 transition-all">
-                      {facing}
-                    </div>
-                  </label>
-                ))}
+                {["North", "East", "South", "West"].map((facing) => {
+                  const isSelected = draftData.flat.facing === facing;
+                  return (
+                    <label key={facing} className="cursor-pointer relative">
+                      <input 
+                        type="radio" 
+                        name="facing" 
+                        className="sr-only" 
+                        checked={isSelected}
+                        onChange={() => handleFacingChange(facing)}
+                      />
+                      <div className={`
+                        flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-semibold transition-all duration-300 ease-out
+                        ${isSelected 
+                          ? 'bg-primary border-primary text-white shadow-md shadow-primary/30 scale-[0.98]'
+                          : 'bg-white border-border text-text-body hover:border-primary/40 hover:shadow-sm hover:bg-slate-50 hover:-translate-y-0.5'}
+                      `}>
+                        <div className={`overflow-hidden transition-all duration-300 ease-out flex items-center justify-center ${isSelected ? 'w-4 opacity-100' : 'w-0 opacity-0'}`}>
+                          <FiCheck className="w-4 h-4 shrink-0" />
+                        </div>
+                        <span>{facing}</span>
+                      </div>
+                    </label>
+                  );
+                })}
               </div>
             </div>
 

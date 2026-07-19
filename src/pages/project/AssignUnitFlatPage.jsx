@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { FiArrowLeft, FiSearch } from "react-icons/fi";
+import { FiSearch } from "react-icons/fi";
+import { FaBuilding } from "react-icons/fa";
 import DashboardLayout from "../../components/DashboardLayout";
 import { useProjects } from "../../context/ProjectContext";
 import { useAssignUnit } from "../../context/AssignUnitContext";
@@ -16,9 +18,15 @@ export default function AssignUnitFlatPage() {
 
   if (!project || !tower) return <div>Invalid selection</div>;
 
+  const [selectedUnitForAnimation, setSelectedUnitForAnimation] = useState(null);
+
   const handleSelectFlat = (unit) => {
-    setFlatSelection(id, draftData.tower, unit);
-    navigate(`/projects/${id}/assign/unit-details`);
+    setSelectedUnitForAnimation(unit.no);
+    
+    setTimeout(() => {
+      setFlatSelection(id, draftData.tower, unit);
+      navigate(`/projects/${id}/assign/unit-details`);
+    }, 650); // 650ms to let the premium animation finish
   };
 
   return (
@@ -72,23 +80,57 @@ export default function AssignUnitFlatPage() {
               <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
                 {floor.units.map(unit => {
                   const isAvailable = unit.status === "available";
+                  const isSelected = selectedUnitForAnimation === unit.no;
+
                   return (
                     <button
                       key={unit.no}
-                      disabled={!isAvailable}
+                      disabled={!isAvailable || selectedUnitForAnimation !== null}
                       onClick={() => handleSelectFlat(unit)}
                       className={`
-                        flex flex-col p-3 rounded-xl border text-left transition-all relative overflow-hidden
-                        ${isAvailable 
+                        flex flex-col p-3 rounded-xl border text-left transition-all duration-500 ease-out relative overflow-hidden
+                        ${isAvailable && !isSelected
                           ? "bg-white border-border hover:border-primary hover:shadow-md cursor-pointer group" 
-                          : "bg-slate-50 border-slate-200 opacity-60 cursor-not-allowed"}
+                          : ""}
+                        ${!isAvailable 
+                          ? "bg-slate-50 border-slate-200 opacity-60 cursor-not-allowed" 
+                          : ""}
+                        ${isSelected 
+                          ? "bg-primary border-primary shadow-lg ring-4 ring-primary/20 transform scale-[0.95]" 
+                          : ""}
                       `}
                     >
-                      {isAvailable && <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />}
+                      {isAvailable && !isSelected && (
+                        <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      )}
                       
-                      <span className="text-lg font-bold text-text-heading mb-1 relative z-10">{unit.no}</span>
-                      <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider relative z-10">{unit.type}</span>
-                      <span className="text-[10px] text-text-placeholder relative z-10">{unit.facing} facing</span>
+                      <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none overflow-hidden">
+                        <div 
+                          className={`absolute w-32 h-32 bg-white/20 rounded-full transition-all duration-700 ease-out
+                                     ${isSelected ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`} 
+                        />
+                        <div 
+                          className={`
+                            relative transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]
+                            flex items-center justify-center w-11 h-11 bg-white/15 rounded-full backdrop-blur-sm border border-white/20
+                            ${isSelected 
+                              ? 'opacity-100 scale-100 translate-y-0 text-white shadow-2xl' 
+                              : 'opacity-0 scale-[0.4] translate-y-8 text-primary'}
+                          `}
+                        >
+                          <FaBuilding className="w-5 h-5 drop-shadow-md" />
+                        </div>
+                      </div>
+
+                      <span className={`text-lg font-bold mb-1 relative z-10 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${isSelected ? 'opacity-0 -translate-y-4 scale-90' : 'opacity-100 translate-y-0 scale-100 text-text-heading'}`}>
+                        {unit.no}
+                      </span>
+                      <span className={`text-[10px] font-semibold uppercase tracking-wider relative z-10 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] delay-75 ${isSelected ? 'opacity-0 -translate-y-4 scale-90' : 'opacity-100 translate-y-0 scale-100 text-text-muted'}`}>
+                        {unit.type}
+                      </span>
+                      <span className={`text-[10px] relative z-10 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] delay-100 ${isSelected ? 'opacity-0 -translate-y-4 scale-90' : 'opacity-100 translate-y-0 scale-100 text-text-placeholder'}`}>
+                        {unit.facing} facing
+                      </span>
                     </button>
                   );
                 })}
