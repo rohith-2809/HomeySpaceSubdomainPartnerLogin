@@ -1,9 +1,63 @@
 import { useNavigate } from "react-router-dom";
-import { FiArrowLeft, FiMapPin, FiChevronDown, FiArrowRight } from "react-icons/fi";
+import { useState, useRef, useEffect } from "react";
+import { FiArrowLeft, FiMapPin, FiChevronDown, FiArrowRight, FiCheck } from "react-icons/fi";
 import DashboardLayout from "../../components/DashboardLayout";
+
+const statesList = [
+  { value: "AP", label: "Andhra Pradesh" },
+  { value: "AR", label: "Arunachal Pradesh" },
+  { value: "AS", label: "Assam" },
+  { value: "BR", label: "Bihar" },
+  { value: "CG", label: "Chhattisgarh" },
+  { value: "GA", label: "Goa" },
+  { value: "GJ", label: "Gujarat" },
+  { value: "HR", label: "Haryana" },
+  { value: "HP", label: "Himachal Pradesh" },
+  { value: "JH", label: "Jharkhand" },
+  { value: "KA", label: "Karnataka" },
+  { value: "KL", label: "Kerala" },
+  { value: "MP", label: "Madhya Pradesh" },
+  { value: "MH", label: "Maharashtra" },
+  { value: "MN", label: "Manipur" },
+  { value: "ML", label: "Meghalaya" },
+  { value: "MZ", label: "Mizoram" },
+  { value: "NL", label: "Nagaland" },
+  { value: "OR", label: "Odisha" },
+  { value: "PB", label: "Punjab" },
+  { value: "RJ", label: "Rajasthan" },
+  { value: "SK", label: "Sikkim" },
+  { value: "TN", label: "Tamil Nadu" },
+  { value: "TS", label: "Telangana" },
+  { value: "TR", label: "Tripura" },
+  { value: "UP", label: "Uttar Pradesh" },
+  { value: "UK", label: "Uttarakhand" },
+  { value: "WB", label: "West Bengal" },
+  { value: "AN", label: "Andaman and Nicobar Islands" },
+  { value: "CH", label: "Chandigarh" },
+  { value: "DN", label: "Dadra and Nagar Haveli and Daman and Diu" },
+  { value: "DL", label: "Delhi" },
+  { value: "JK", label: "Jammu and Kashmir" },
+  { value: "LA", label: "Ladakh" },
+  { value: "LD", label: "Lakshadweep" },
+  { value: "PY", label: "Puducherry" },
+];
 
 export default function LocationDetailsPage() {
   const navigate = useNavigate();
+  const [isStateDropdownOpen, setIsStateDropdownOpen] = useState(false);
+  const [selectedState, setSelectedState] = useState("");
+  const dropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsStateDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -131,53 +185,46 @@ export default function LocationDetailsPage() {
                 <label className="block text-sm font-medium text-text-heading">
                   State *
                 </label>
-                <div className="relative">
-                  <select
-                    required
-                    className="w-full px-4 py-3 bg-white border border-border rounded-xl text-sm text-text-heading
-                               appearance-none focus:outline-none focus:ring-2 focus:ring-primary/20
-                               focus:border-primary transition-all cursor-pointer"
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    type="button"
+                    onClick={() => setIsStateDropdownOpen(!isStateDropdownOpen)}
+                    className={`w-full flex items-center justify-between px-4 py-3 bg-white border rounded-xl text-sm transition-all duration-200
+                      ${isStateDropdownOpen ? 'border-primary ring-2 ring-primary/20 shadow-sm' : 'border-border hover:border-slate-300'}
+                      ${selectedState ? 'text-text-heading' : 'text-text-placeholder'}`}
                   >
-                    <option value="" disabled selected>Select state / UT</option>
-                    <option value="AP">Andhra Pradesh</option>
-                    <option value="AR">Arunachal Pradesh</option>
-                    <option value="AS">Assam</option>
-                    <option value="BR">Bihar</option>
-                    <option value="CG">Chhattisgarh</option>
-                    <option value="GA">Goa</option>
-                    <option value="GJ">Gujarat</option>
-                    <option value="HR">Haryana</option>
-                    <option value="HP">Himachal Pradesh</option>
-                    <option value="JH">Jharkhand</option>
-                    <option value="KA">Karnataka</option>
-                    <option value="KL">Kerala</option>
-                    <option value="MP">Madhya Pradesh</option>
-                    <option value="MH">Maharashtra</option>
-                    <option value="MN">Manipur</option>
-                    <option value="ML">Meghalaya</option>
-                    <option value="MZ">Mizoram</option>
-                    <option value="NL">Nagaland</option>
-                    <option value="OR">Odisha</option>
-                    <option value="PB">Punjab</option>
-                    <option value="RJ">Rajasthan</option>
-                    <option value="SK">Sikkim</option>
-                    <option value="TN">Tamil Nadu</option>
-                    <option value="TS">Telangana</option>
-                    <option value="TR">Tripura</option>
-                    <option value="UP">Uttar Pradesh</option>
-                    <option value="UK">Uttarakhand</option>
-                    <option value="WB">West Bengal</option>
-                    <option value="AN">Andaman and Nicobar Islands</option>
-                    <option value="CH">Chandigarh</option>
-                    <option value="DN">Dadra and Nagar Haveli and Daman and Diu</option>
-                    <option value="DL">Delhi</option>
-                    <option value="JK">Jammu and Kashmir</option>
-                    <option value="LA">Ladakh</option>
-                    <option value="LD">Lakshadweep</option>
-                    <option value="PY">Puducherry</option>
-                  </select>
-                  <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
+                    <span>
+                      {selectedState ? statesList.find(s => s.value === selectedState)?.label : "Select state / UT"}
+                    </span>
+                    <FiChevronDown className={`w-4 h-4 text-text-muted transition-transform duration-300 ${isStateDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  <div
+                    className={`absolute z-10 w-full mt-2 bg-white border border-border rounded-xl shadow-lg shadow-black/5 overflow-hidden transition-all duration-200 origin-top
+                      ${isStateDropdownOpen ? 'opacity-100 scale-y-100 visible' : 'opacity-0 scale-y-95 invisible'}`}
+                  >
+                    <div className="max-h-60 overflow-y-auto custom-scrollbar py-1">
+                      {statesList.map((state) => (
+                        <button
+                          key={state.value}
+                          type="button"
+                          onClick={() => {
+                            setSelectedState(state.value);
+                            setIsStateDropdownOpen(false);
+                          }}
+                          className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center justify-between
+                            ${selectedState === state.value ? 'bg-primary/5 text-primary font-medium' : 'text-text-heading hover:bg-slate-50'}`}
+                        >
+                          {state.label}
+                          {selectedState === state.value && <FiCheck className="w-4 h-4 text-primary" />}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
+                {/* Hidden input to ensure native form validation works if needed */}
+                <input type="hidden" required value={selectedState} />
               </div>
 
             </div>

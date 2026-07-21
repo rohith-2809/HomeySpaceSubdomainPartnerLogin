@@ -9,7 +9,11 @@ const initialDraftState = {
   buyer: {
     fullName: "",
     phone: "",
-    email: ""
+    email: "",
+    hasCoApplicant: false,
+    coApplicantName: "",
+    coApplicantPhone: "",
+    coApplicantEmail: ""
   },
   booking: {
     date: "",
