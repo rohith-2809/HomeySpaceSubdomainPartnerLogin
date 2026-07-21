@@ -20,45 +20,47 @@ src/
 │   ├── ProjectContext.jsx       # Holds global project data, unit availability, and booking logic
 │   └── AssignUnitContext.jsx    # Holds the temporary draft state while navigating the Assign Unit flow
 │
-├── pages/                       # All route-level components
+├── pages/                       # All route-level components (26 Total Pages)
 │   │
 │   ├── auth & onboarding/       # Initial entry points
-│   │   ├── LoginPage.jsx
-│   │   ├── CompanyProfilePage.jsx
-│   │   ├── BasicInfoPage.jsx
-│   │   └── ReviewConfirmPage.jsx
+│   │   ├── LoginPage.jsx                 # Authentication screen.
+│   │   ├── CompanyProfilePage.jsx        # Form screen for partner's company details.
+│   │   ├── BasicInfoPage.jsx             # Form screen for collecting basic information.
+│   │   └── ReviewConfirmPage.jsx         # Screen to review details before final confirmation.
 │   │
 │   ├── status/                  # Terminal states for partner verification
-│   │   ├── ApplicationSubmittedPage.jsx
-│   │   ├── VerificationPendingPage.jsx
-│   │   └── AccountVerifiedPage.jsx
+│   │   ├── ApplicationSubmittedPage.jsx  # Confirmation screen after an application is submitted.
+│   │   ├── VerificationPendingPage.jsx   # Status screen showing that account verification is in progress.
+│   │   └── AccountVerifiedPage.jsx       # Screen shown when a partner account is successfully verified.
 │   │
 │   ├── dashboard/               # Core logged-in views
-│   │   ├── DashboardHomePage.jsx
-│   │   └── UnderConstructionPage.jsx (Placeholder for Team, Sales, Settings)
+│   │   ├── DashboardHomePage.jsx         # Main dashboard view after login.
+│   │   └── UnderConstructionPage.jsx     # Placeholder screen for features in development.
 │   │
 │   └── project/                 # The core functional domain of the app
 │       │
 │       ├── (Project Hub)
-│       │   ├── ProjectsListPage.jsx      # Grid view of all projects
-│       │   └── ProjectDetailPage.jsx     # Central hub for a specific project
+│       │   ├── ProjectsListPage.jsx      # List/grid view of all projects.
+│       │   ├── ProjectDetailPage.jsx     # Detailed hub view for a specific project.
+│       │   ├── DocumentsGalleryPage.jsx  # Page to manage and view project documents and media galleries.
+│       │   └── FloorPlansPage.jsx        # Screen displaying the available floor plans grouped by tower.
 │       │
 │       ├── (Setup Flow)                  # Creating a brand new project
-│       │   ├── AddProjectPage.jsx
-│       │   ├── LocationDetailsPage.jsx
-│       │   ├── TowersBlocksPage.jsx
-│       │   ├── UnitsSetupPage.jsx
-│       │   ├── ReviewSetupPage.jsx
-│       │   └── ProjectCompletePage.jsx
+│       │   ├── AddProjectPage.jsx        # Screen to initialize adding a new project.
+│       │   ├── LocationDetailsPage.jsx   # Form screen to define a project's location details.
+│       │   ├── TowersBlocksPage.jsx      # Screen to configure towers/blocks for a project.
+│       │   ├── UnitsSetupPage.jsx        # Screen to configure the specific units within towers.
+│       │   ├── ReviewSetupPage.jsx       # Final review step before completing a new project setup.
+│       │   └── ProjectCompletePage.jsx   # Confirmation screen indicating a new project setup is fully complete.
 │       │
 │       └── (Assign Unit Flow)            # Booking/Selling a specific unit
-│           ├── AssignUnitTowerPage.jsx   # Step 1: Pick tower
-│           ├── AssignUnitFlatPage.jsx    # Step 2: Pick flat (Visual Grid)
-│           ├── AssignUnitDetailsPage.jsx # Step 3: Confirm unit specs
-│           ├── AssignBuyerDetailsPage.jsx# Step 4: Buyer details
-│           ├── AssignBookingDetailsPage.jsx# Step 5: Financials & dates
-│           ├── AssignReviewPage.jsx      # Step 6: Final review
-│           └── AssignCompletePage.jsx    # Success receipt
+│           ├── AssignUnitTowerPage.jsx   # Specific screen to select the tower/block for assignment.
+│           ├── AssignUnitFlatPage.jsx    # Specific screen to select the flat/unit for assignment.
+│           ├── AssignUnitDetailsPage.jsx # General unit details assignment screen.
+│           ├── AssignBuyerDetailsPage.jsx# Screen to input buyer information during unit assignment.
+│           ├── AssignBookingDetailsPage.jsx# Screen for adding booking details when assigning a unit.
+│           ├── AssignReviewPage.jsx      # Review screen to verify all details before finalizing a unit assignment.
+│           └── AssignCompletePage.jsx    # Success screen after a unit is successfully assigned.
 │
 ├── App.jsx                      # Main router, wires all pages to their URLs
 ├── index.css                    # Tailwind CSS configuration, custom design tokens, and utility classes

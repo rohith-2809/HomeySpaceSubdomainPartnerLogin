@@ -31,6 +31,8 @@ import AssignBuyerDetailsPage   from "./pages/project/AssignBuyerDetailsPage";
 import AssignBookingDetailsPage from "./pages/project/AssignBookingDetailsPage";
 import AssignReviewPage         from "./pages/project/AssignReviewPage";
 import AssignCompletePage       from "./pages/project/AssignCompletePage";
+import DocumentsGalleryPage    from "./pages/project/DocumentsGalleryPage";
+import FloorPlansPage          from "./pages/project/FloorPlansPage";
 
 export default function App() {
   return (
@@ -76,6 +78,8 @@ export default function App() {
             <Route path="/projects/:id/assign/booking-details" element={<AssignBookingDetailsPage />} />
             <Route path="/projects/:id/assign/review"        element={<AssignReviewPage />} />
             <Route path="/projects/:id/assign/complete"      element={<AssignCompletePage />} />
+            <Route path="/projects/:id/documents"            element={<DocumentsGalleryPage />} />
+            <Route path="/projects/:id/floor-plans"          element={<FloorPlansPage />} />
 
             {/* ── Catch-all / 404 Redirects ── */}
             <Route path="/index.html"             element={<Navigate to="/" replace />} />

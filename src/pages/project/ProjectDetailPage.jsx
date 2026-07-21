@@ -58,16 +58,25 @@ export default function ProjectDetailPage() {
 
             {/* Stats & Progress */}
             <div className="bg-slate-50 rounded-xl p-4 border border-border">
-              <div className="flex items-center justify-between mb-3 text-sm">
-                <div>
-                  <span className="font-bold text-text-heading">{project.totalUnits}</span> <span className="text-text-muted">Total Units</span>
+              <div className="grid grid-cols-3 divide-x divide-slate-200 mb-4">
+                <div className="text-center pr-4">
+                  <p className="text-xl font-bold text-text-heading">{project.totalUnits}</p>
+                  <p className="text-xs text-text-muted mt-0.5">Total Units</p>
                 </div>
-                <div className="flex gap-4">
-                  <div><span className="font-bold text-amber-500">{project.soldUnits}</span> <span className="text-text-muted">Sold</span></div>
-                  <div><span className="font-bold text-primary">{project.availableUnits}</span> <span className="text-text-muted">Available</span></div>
+                <div className="text-center px-4">
+                  <p className="text-xl font-bold text-amber-500">{project.soldUnits}</p>
+                  <p className="text-xs text-text-muted mt-0.5">Sold</p>
+                </div>
+                <div className="text-center pl-4">
+                  <p className="text-xl font-bold text-primary">{project.availableUnits}</p>
+                  <p className="text-xs text-text-muted mt-0.5">Available</p>
                 </div>
               </div>
               
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs font-semibold text-text-muted">Sales Progress</p>
+                <p className="text-xs font-bold text-primary">{salesPercentage}%</p>
+              </div>
               <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-primary transition-all duration-1000 ease-out rounded-full" 
@@ -120,7 +129,7 @@ export default function ProjectDetailPage() {
                 <FiGrid className="w-4 h-4 text-primary" />
                 <h3 className="text-sm font-bold text-text-heading">Towers Overview</h3>
               </div>
-              <p className="text-xs text-text-muted">1 Tower · Configured blocks</p>
+              <p className="text-xs text-text-muted">{project.towers?.length ?? 0} Tower{project.towers?.length !== 1 ? 's' : ''} · Configured blocks</p>
             </div>
             <button className="text-xs font-semibold text-primary hover:text-primary-hover cursor-pointer">Manage</button>
           </div>
@@ -131,9 +140,12 @@ export default function ProjectDetailPage() {
                 <FiGrid className="w-4 h-4 text-primary" />
                 <h3 className="text-sm font-bold text-text-heading">Floor Plans</h3>
               </div>
-              <p className="text-xs text-text-muted">1 Plan available</p>
+              <p className="text-xs text-text-muted">8 Plans available</p>
             </div>
-            <button className="text-xs font-semibold text-primary hover:text-primary-hover cursor-pointer">View</button>
+            <button
+              onClick={() => navigate(`/projects/${id}/floor-plans`)}
+              className="text-xs font-semibold text-primary hover:text-primary-hover cursor-pointer"
+            >View</button>
           </div>
 
           <div className="bg-white p-5 rounded-xl border border-border flex items-center justify-between md:col-span-2">
@@ -142,9 +154,12 @@ export default function ProjectDetailPage() {
                 <FiFileText className="w-4 h-4 text-primary" />
                 <h3 className="text-sm font-bold text-text-heading">Documents & Gallery</h3>
               </div>
-              <p className="text-xs text-text-muted">Contracts and media. Upload from Unit Details.</p>
+              <p className="text-xs text-text-muted">Contracts and media</p>
             </div>
-            <button className="text-xs font-semibold text-primary hover:text-primary-hover cursor-pointer">View</button>
+            <button
+              onClick={() => navigate(`/projects/${id}/documents`)}
+              className="text-xs font-semibold text-primary hover:text-primary-hover cursor-pointer"
+            >View</button>
           </div>
         </div>
 
