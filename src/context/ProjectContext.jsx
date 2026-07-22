@@ -12,6 +12,7 @@ export function ProjectProvider({ children }) {
       soldUnits: 124,
       availableUnits: 176,
       status: "Active",
+      description: "An ultra-premium residential enclave offering unparalleled luxury, panoramic cityscapes, and bespoke amenities. Designed for those who appreciate the finer things in life, Vasavi Skies redefines modern urban living.",
       image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80",
       towers: [
         {
@@ -74,6 +75,7 @@ export function ProjectProvider({ children }) {
       soldUnits: 0,
       availableUnits: 200,
       status: "Draft",
+      description: "A visionary development featuring state-of-the-art architecture and expansive green spaces. Godrej Summit is crafted to deliver a harmonious blend of tranquility and contemporary lifestyle conveniences.",
       image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=600&q=80",
       towers: []
     }

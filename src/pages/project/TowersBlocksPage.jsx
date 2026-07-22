@@ -1,15 +1,12 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { FiArrowLeft, FiMoreVertical, FiPlus, FiArrowRight, FiTrash2 } from "react-icons/fi";
-import DashboardLayout from "../../components/DashboardLayout";
+import { FiMoreVertical, FiPlus, FiTrash2, FiGrid } from "react-icons/fi";
+import ProjectSetupLayout from "../../components/ProjectSetupLayout";
 
 export default function TowersBlocksPage() {
-  const navigate = useNavigate();
-
-  // State to hold the repeatable towers
   const [towers, setTowers] = useState([
-    { id: 1, name: "", floors: "", unitsPerFloor: "" }
+    { id: 1, name: "Tower A", floors: "12", unitsPerFloor: "4" }
   ]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleAddTower = () => {
     setTowers([...towers, { id: Date.now(), name: "", floors: "", unitsPerFloor: "" }]);
@@ -27,68 +24,86 @@ export default function TowersBlocksPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    navigate("/projects/new/units");
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setIsSubmitting(false);
+      document.getElementById("btn-setup-next").click();
+    }, 500);
   };
 
+  const totalProjectUnits = towers.reduce((acc, tower) => {
+    const floors = parseInt(tower.floors) || 0;
+    const units = parseInt(tower.unitsPerFloor) || 0;
+    return acc + (floors * units);
+  }, 0);
+
   return (
-    <DashboardLayout
-      activeNav="Projects"
-      locked={false}
-      topBarTitle="Setup Project"
-      topBarSubtitle="Step 3 of 4"
+    <ProjectSetupLayout
+      currentStep={3}
+      formId="towers-form"
+      isSubmitting={isSubmitting}
+      title="Setup Project"
+      subtitle="Step 3: Towers & Blocks"
     >
-      <div className="max-w-[640px] mx-auto animate-fade-in">
-        
-        {/* ── Heading ── */}
-        <div className="mb-8 space-y-1.5">
-          <h2 className="text-2xl font-bold text-text-heading tracking-tight">
-            Towers &amp; Blocks
-          </h2>
-          <p className="text-sm text-text-muted leading-relaxed">
-            Add towers or blocks for this project. You can configure detailed unit configurations in the next step.
-          </p>
+      <div className="animate-fade-in w-full max-w-6xl">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+          <div>
+            <h2 className="text-2xl font-bold text-text-heading tracking-tight mb-2">
+              Towers &amp; Blocks
+            </h2>
+            <p className="text-sm text-text-muted">
+              Add towers or blocks. You can configure detailed unit configurations in the next step.
+            </p>
+          </div>
+          <div className="bg-primary/10 border border-primary/20 px-4 py-2.5 rounded-xl flex items-center gap-3">
+            <FiGrid className="w-5 h-5 text-primary" />
+            <div>
+              <p className="text-[10px] font-bold text-primary uppercase tracking-wider">Total Units</p>
+              <p className="text-lg font-bold text-primary leading-none">{totalProjectUnits}</p>
+            </div>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-
-          {/* ── Repeatable Tower Cards ── */}
-          <div className="space-y-5">
+        <form id="towers-form" onSubmit={handleSubmit}>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+            {/* ── Repeatable Tower Cards ── */}
             {towers.map((tower, index) => {
               const floors = parseInt(tower.floors) || 0;
               const unitsPerFloor = parseInt(tower.unitsPerFloor) || 0;
               const totalUnits = floors * unitsPerFloor;
 
               return (
-                <div key={tower.id} className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
+                <div key={tower.id} className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden flex flex-col group hover:border-primary/30 transition-colors">
                   
                   {/* Card Header */}
-                  <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 bg-slate-50/50">
-                    <h3 className="text-sm font-semibold text-text-heading">
+                  <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100 bg-slate-50/50">
+                    <h3 className="text-sm font-bold text-text-heading">
                       Tower {index + 1}
                     </h3>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       {towers.length > 1 && (
                         <button
                           type="button"
                           onClick={() => handleRemoveTower(tower.id)}
-                          className="p-1.5 text-slate-400 hover:text-red-500 transition-colors rounded-md"
+                          className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors rounded-md"
                           aria-label="Remove Tower"
                         >
                           <FiTrash2 className="w-4 h-4" />
                         </button>
                       )}
-                      <button type="button" className="p-1.5 text-slate-400 hover:text-text-heading transition-colors rounded-md">
+                      <button type="button" className="p-1.5 text-slate-400 hover:text-text-heading hover:bg-slate-200 transition-colors rounded-md">
                         <FiMoreVertical className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
 
                   {/* Card Body */}
-                  <div className="p-5 space-y-5">
+                  <div className="p-5 flex-1 flex flex-col gap-5">
                     
                     {/* Tower Name */}
                     <div className="space-y-1.5">
-                      <label className="block text-sm font-medium text-text-heading">
+                      <label className="block text-xs font-semibold text-text-muted uppercase tracking-wider">
                         Tower Name *
                       </label>
                       <input
@@ -97,17 +112,17 @@ export default function TowersBlocksPage() {
                         value={tower.name}
                         onChange={(e) => handleTowerChange(tower.id, "name", e.target.value)}
                         placeholder="e.g. Tower A"
-                        className="w-full px-4 py-3 bg-white border border-border rounded-xl text-sm text-text-heading
+                        className="w-full px-4 py-2.5 bg-white border border-border rounded-xl text-sm text-text-heading
                                    placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary/20
-                                   focus:border-primary transition-all"
+                                   focus:border-primary transition-all shadow-sm"
                       />
                     </div>
 
                     {/* Side-by-side: Floors & Units */}
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1.5">
-                        <label className="block text-sm font-medium text-text-heading">
-                          No. of Floors *
+                        <label className="block text-xs font-semibold text-text-muted uppercase tracking-wider">
+                          Floors *
                         </label>
                         <input
                           type="number"
@@ -116,14 +131,14 @@ export default function TowersBlocksPage() {
                           value={tower.floors}
                           onChange={(e) => handleTowerChange(tower.id, "floors", e.target.value)}
                           placeholder="e.g. 24"
-                          className="w-full px-4 py-3 bg-white border border-border rounded-xl text-sm text-text-heading
+                          className="w-full px-4 py-2.5 bg-white border border-border rounded-xl text-sm text-text-heading
                                      placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary/20
-                                     focus:border-primary transition-all"
+                                     focus:border-primary transition-all shadow-sm"
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <label className="block text-sm font-medium text-text-heading">
-                          Units per Floor *
+                        <label className="block text-xs font-semibold text-text-muted uppercase tracking-wider">
+                          Units/Floor *
                         </label>
                         <input
                           type="number"
@@ -132,70 +147,45 @@ export default function TowersBlocksPage() {
                           value={tower.unitsPerFloor}
                           onChange={(e) => handleTowerChange(tower.id, "unitsPerFloor", e.target.value)}
                           placeholder="e.g. 4"
-                          className="w-full px-4 py-3 bg-white border border-border rounded-xl text-sm text-text-heading
+                          className="w-full px-4 py-2.5 bg-white border border-border rounded-xl text-sm text-text-heading
                                      placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary/20
-                                     focus:border-primary transition-all"
+                                     focus:border-primary transition-all shadow-sm"
                         />
                       </div>
                     </div>
 
                     {/* Computed Total Line */}
-                    <div className="pt-2">
-                      <p className="text-sm font-medium text-text-muted bg-slate-50 px-4 py-2.5 rounded-lg border border-slate-100">
-                        Total Units: <span className="font-semibold text-text-heading">{totalUnits} Units</span>
-                      </p>
+                    <div className="mt-auto pt-4">
+                      <div className="flex items-center justify-between text-sm bg-slate-50 px-4 py-3 rounded-xl border border-border">
+                        <span className="font-semibold text-text-muted">Tower Total</span>
+                        <span className="font-bold text-text-heading">{totalUnits} Units</span>
+                      </div>
                     </div>
 
                   </div>
                 </div>
               );
             })}
-          </div>
 
-          {/* ── Add More Button ── */}
-          <div>
+            {/* ── Add More Button Card ── */}
             <button
               type="button"
               onClick={handleAddTower}
-              className="w-full flex items-center justify-center gap-2 py-3.5 px-4
-                         rounded-xl border-2 border-dashed border-slate-300 bg-white
-                         text-sm font-semibold text-text-muted hover:text-text-heading
-                         hover:border-slate-400 hover:bg-slate-50 transition-all duration-200 cursor-pointer"
+              className="flex flex-col items-center justify-center gap-3 min-h-[300px]
+                         rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/50
+                         text-slate-400 hover:text-primary
+                         hover:border-primary/50 hover:bg-primary/5 transition-all duration-200 cursor-pointer"
             >
-              <FiPlus className="w-4 h-4" />
-              <span>Add more towers</span>
-            </button>
-          </div>
-
-          {/* ── Action Buttons ── */}
-          <div className="pt-6 mt-4 border-t border-border flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-3">
-            <button
-              type="button"
-              onClick={() => navigate("/projects/new/location")}
-              className="group w-full md:w-auto flex items-center justify-center gap-2 py-3 px-6
-                         rounded-xl border border-border bg-white text-sm font-semibold text-text-body
-                         hover:border-slate-300 hover:text-text-heading hover:-translate-x-px
-                         active:translate-x-0 active:scale-[0.99]
-                         transition-all duration-300 cursor-pointer"
-            >
-              <FiArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform duration-300" />
-              <span>Back</span>
-            </button>
-            <button
-              type="submit"
-              className="group w-full md:w-auto flex items-center justify-center gap-2 py-3.5 px-8
-                         rounded-xl bg-primary text-white text-sm font-semibold
-                         hover:bg-primary-hover hover:-translate-y-px active:translate-y-0 active:scale-[0.99]
-                         shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/25
-                         transition-all duration-300 cursor-pointer"
-            >
-              <span>Next Step</span>
-              <FiArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-300" />
+              <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center mb-2">
+                <FiPlus className="w-6 h-6" />
+              </div>
+              <span className="text-sm font-bold text-text-heading">Add Another Tower</span>
+              <span className="text-xs text-text-muted text-center max-w-[200px]">Create an additional block or tower configuration</span>
             </button>
           </div>
 
         </form>
       </div>
-    </DashboardLayout>
+    </ProjectSetupLayout>
   );
 }

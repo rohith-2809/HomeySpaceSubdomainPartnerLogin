@@ -1,23 +1,21 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { FiArrowLeft, FiMoreVertical, FiPlus, FiArrowRight, FiTrash2, FiChevronDown } from "react-icons/fi";
-import DashboardLayout from "../../components/DashboardLayout";
+import { FiMoreVertical, FiPlus, FiTrash2, FiChevronDown, FiLayers } from "react-icons/fi";
+import ProjectSetupLayout from "../../components/ProjectSetupLayout";
 
 const BHK_OPTIONS = ["1 BHK", "2 BHK", "3 BHK", "4 BHK", "4+ BHK"];
 const FACING_OPTIONS = ["North", "East", "South", "West"];
 
 export default function UnitsSetupPage() {
-  const navigate = useNavigate();
-
   const [configs, setConfigs] = useState([
     {
       id: 1,
       bhk: "3 BHK",
-      sizes: [{ id: 1, area: "", unit: "Sq. Ft." }],
+      sizes: [{ id: 1, area: "1250", unit: "Sq. Ft." }],
       facing: ["East"],
-      numbering: ""
+      numbering: "Series 01"
     }
   ]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleAddConfig = () => {
     setConfigs([...configs, {
@@ -82,67 +80,79 @@ export default function UnitsSetupPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    navigate("/projects/new/review");
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setIsSubmitting(false);
+      document.getElementById("btn-setup-next").click();
+    }, 500);
   };
 
   return (
-    <DashboardLayout
-      activeNav="Projects"
-      locked={false}
-      topBarTitle="Setup Project"
-      topBarSubtitle="Step 4 of 4"
+    <ProjectSetupLayout
+      currentStep={4}
+      formId="units-form"
+      isSubmitting={isSubmitting}
+      title="Setup Project"
+      subtitle="Step 4: Unit Configurations"
     >
-      <div className="max-w-[640px] mx-auto animate-fade-in">
+      <div className="animate-fade-in w-full max-w-6xl">
         
-        {/* ── Heading ── */}
-        <div className="mb-8 space-y-1.5">
-          <h2 className="text-2xl font-bold text-text-heading tracking-tight">
-            Units Setup
-          </h2>
-          <p className="text-sm text-text-muted leading-relaxed">
-            Define the unit configurations, sizes, and facing directions for the selected tower.
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+          <div>
+            <h2 className="text-2xl font-bold text-text-heading tracking-tight mb-2">
+              Units Setup
+            </h2>
+            <p className="text-sm text-text-muted">
+              Define the unit configurations, sizes, and facing directions for the project.
+            </p>
+          </div>
+          <div className="bg-primary/10 border border-primary/20 px-4 py-2.5 rounded-xl flex items-center gap-3">
+            <FiLayers className="w-5 h-5 text-primary" />
+            <div>
+              <p className="text-[10px] font-bold text-primary uppercase tracking-wider">Configurations</p>
+              <p className="text-lg font-bold text-primary leading-none">{configs.length}</p>
+            </div>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form id="units-form" onSubmit={handleSubmit}>
 
-          {/* ── Repeatable Configuration Cards ── */}
-          <div className="space-y-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* ── Repeatable Configuration Cards ── */}
             {configs.map((config, index) => {
-              // Fake auto-calculated total units based on number of sizes added to simulate behavior
               const computedTotal = config.sizes.length * 12;
 
               return (
-                <div key={config.id} className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
+                <div key={config.id} className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden flex flex-col group hover:border-primary/30 transition-colors">
                   
                   {/* Card Header */}
-                  <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 bg-slate-50/50">
-                    <h3 className="text-sm font-semibold text-text-heading">
+                  <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100 bg-slate-50/50">
+                    <h3 className="text-sm font-bold text-text-heading">
                       Configuration {index + 1}
                     </h3>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       {configs.length > 1 && (
                         <button
                           type="button"
                           onClick={() => handleRemoveConfig(config.id)}
-                          className="p-1.5 text-slate-400 hover:text-red-500 transition-colors rounded-md"
+                          className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors rounded-md"
                           aria-label="Remove Configuration"
                         >
                           <FiTrash2 className="w-4 h-4" />
                         </button>
                       )}
-                      <button type="button" className="p-1.5 text-slate-400 hover:text-text-heading transition-colors rounded-md">
+                      <button type="button" className="p-1.5 text-slate-400 hover:text-text-heading hover:bg-slate-200 transition-colors rounded-md">
                         <FiMoreVertical className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
 
                   {/* Card Body */}
-                  <div className="p-5 space-y-6">
+                  <div className="p-5 flex-1 flex flex-col gap-6">
                     
                     {/* Unit Type (BHK) */}
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-text-heading">
+                      <label className="block text-xs font-semibold text-text-muted uppercase tracking-wider">
                         Unit Type
                       </label>
                       <div className="flex flex-wrap gap-2">
@@ -151,10 +161,10 @@ export default function UnitsSetupPage() {
                             key={opt}
                             type="button"
                             onClick={() => updateConfig(config.id, "bhk", opt)}
-                            className={`px-4 py-2 rounded-lg text-[13px] font-semibold transition-all duration-200
+                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200
                                         ${config.bhk === opt
-                                          ? "bg-primary text-white shadow-sm"
-                                          : "bg-white text-text-body border border-border hover:border-slate-300 hover:text-text-heading"
+                                          ? "bg-primary text-white shadow-sm ring-1 ring-primary"
+                                          : "bg-slate-50 text-text-muted border border-border hover:border-slate-300 hover:text-text-heading"
                                         }`}
                           >
                             {opt}
@@ -163,66 +173,9 @@ export default function UnitsSetupPage() {
                       </div>
                     </div>
 
-                    {/* Unit Sizes */}
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <label className="block text-sm font-medium text-text-heading">
-                          Unit Sizes
-                        </label>
-                        <button
-                          type="button"
-                          onClick={() => handleAddSize(config.id)}
-                          className="text-xs font-semibold text-primary hover:text-primary-hover transition-colors"
-                        >
-                          + Add more sizes
-                        </button>
-                      </div>
-                      
-                      <div className="space-y-3">
-                        {config.sizes.map((size, sizeIndex) => (
-                          <div key={size.id} className="flex items-center gap-3">
-                            <div className="flex-1 relative">
-                              <input
-                                type="number"
-                                required
-                                value={size.area}
-                                onChange={(e) => updateSize(config.id, size.id, "area", e.target.value)}
-                                placeholder="Carpet Area (e.g. 1250)"
-                                className="w-full px-4 py-3 bg-white border border-border rounded-xl text-sm text-text-heading
-                                           placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary/20
-                                           focus:border-primary transition-all"
-                              />
-                            </div>
-                            <div className="w-28 shrink-0 relative">
-                              <select
-                                value={size.unit}
-                                onChange={(e) => updateSize(config.id, size.id, "unit", e.target.value)}
-                                className="w-full px-4 py-3 bg-white border border-border rounded-xl text-sm text-text-heading
-                                           appearance-none focus:outline-none focus:ring-2 focus:ring-primary/20
-                                           focus:border-primary transition-all cursor-pointer"
-                              >
-                                <option value="Sq. Ft.">Sq. Ft.</option>
-                                <option value="Sq. M.">Sq. M.</option>
-                              </select>
-                              <FiChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
-                            </div>
-                            {config.sizes.length > 1 && (
-                              <button
-                                type="button"
-                                onClick={() => handleRemoveSize(config.id, size.id)}
-                                className="p-2 text-slate-400 hover:text-red-500 transition-colors"
-                              >
-                                <FiTrash2 className="w-4 h-4" />
-                              </button>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
                     {/* Facing (Multi-select) */}
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-text-heading">
+                      <label className="block text-xs font-semibold text-text-muted uppercase tracking-wider">
                         Facing
                       </label>
                       <div className="flex flex-wrap gap-2">
@@ -233,10 +186,10 @@ export default function UnitsSetupPage() {
                               key={opt}
                               type="button"
                               onClick={() => toggleFacing(config.id, opt)}
-                              className={`px-4 py-2 rounded-lg text-[13px] font-semibold transition-all duration-200
+                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200
                                           ${isSelected
-                                            ? "bg-primary text-white shadow-sm"
-                                            : "bg-white text-text-body border border-border hover:border-slate-300 hover:text-text-heading"
+                                            ? "bg-primary/10 text-primary border border-primary/30"
+                                            : "bg-slate-50 text-text-muted border border-border hover:border-slate-300 hover:text-text-heading"
                                           }`}
                             >
                               {opt}
@@ -248,7 +201,7 @@ export default function UnitsSetupPage() {
 
                     {/* Unit Numbering */}
                     <div className="space-y-1.5">
-                      <label className="block text-sm font-medium text-text-heading">
+                      <label className="block text-xs font-semibold text-text-muted uppercase tracking-wider">
                         Unit Numbering
                       </label>
                       <input
@@ -256,69 +209,101 @@ export default function UnitsSetupPage() {
                         value={config.numbering}
                         onChange={(e) => updateConfig(config.id, "numbering", e.target.value)}
                         placeholder="e.g. Series 01"
-                        className="w-full px-4 py-3 bg-white border border-border rounded-xl text-sm text-text-heading
+                        className="w-full px-4 py-2 bg-white border border-border rounded-xl text-sm text-text-heading
                                    placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary/20
-                                   focus:border-primary transition-all"
+                                   focus:border-primary transition-all shadow-sm"
                       />
                     </div>
 
+                    {/* Unit Sizes */}
+                    <div className="space-y-3 bg-slate-50/50 p-4 rounded-xl border border-border">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-xs font-semibold text-text-muted uppercase tracking-wider">
+                          Unit Sizes
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => handleAddSize(config.id)}
+                          className="text-xs font-bold text-primary hover:text-primary-hover transition-colors flex items-center gap-1"
+                        >
+                          <FiPlus className="w-3 h-3"/> Add size
+                        </button>
+                      </div>
+                      
+                      <div className="space-y-2.5">
+                        {config.sizes.map((size) => (
+                          <div key={size.id} className="flex items-center gap-2">
+                            <div className="flex-1">
+                              <input
+                                type="number"
+                                required
+                                value={size.area}
+                                onChange={(e) => updateSize(config.id, size.id, "area", e.target.value)}
+                                placeholder="Area (e.g. 1250)"
+                                className="w-full px-3 py-2 bg-white border border-border rounded-lg text-sm text-text-heading
+                                           placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary/20
+                                           focus:border-primary transition-all shadow-sm"
+                              />
+                            </div>
+                            <div className="w-24 shrink-0 relative">
+                              <select
+                                value={size.unit}
+                                onChange={(e) => updateSize(config.id, size.id, "unit", e.target.value)}
+                                className="w-full px-3 py-2 bg-white border border-border rounded-lg text-xs font-medium text-text-heading
+                                           appearance-none focus:outline-none focus:ring-2 focus:ring-primary/20
+                                           focus:border-primary transition-all cursor-pointer shadow-sm"
+                              >
+                                <option value="Sq. Ft.">Sq. Ft.</option>
+                                <option value="Sq. M.">Sq. M.</option>
+                              </select>
+                              <FiChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-text-muted pointer-events-none" />
+                            </div>
+                            {config.sizes.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveSize(config.id, size.id)}
+                                className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                              >
+                                <FiTrash2 className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
                     {/* Computed Total Line */}
-                    <div className="pt-2">
-                      <p className="text-sm font-medium text-text-muted bg-slate-50 px-4 py-2.5 rounded-lg border border-slate-100">
-                        Total Units (Configuration {index + 1}): <span className="font-semibold text-text-heading">{computedTotal} Units</span>
-                      </p>
+                    <div className="mt-auto pt-4">
+                      <div className="flex items-center justify-between text-sm bg-slate-100 px-4 py-3 rounded-xl border border-slate-200">
+                        <span className="font-semibold text-text-muted">Total Units</span>
+                        <span className="font-bold text-text-heading">{computedTotal} Units</span>
+                      </div>
                     </div>
 
                   </div>
                 </div>
               );
             })}
-          </div>
 
-          {/* ── Add More Button ── */}
-          <div>
+            {/* ── Add More Button Card ── */}
             <button
               type="button"
               onClick={handleAddConfig}
-              className="w-full flex items-center justify-center gap-2 py-3.5 px-4
-                         rounded-xl border-2 border-dashed border-slate-300 bg-white
-                         text-sm font-semibold text-text-muted hover:text-text-heading
-                         hover:border-slate-400 hover:bg-slate-50 transition-all duration-200 cursor-pointer"
+              className="flex flex-col items-center justify-center gap-3 min-h-[400px]
+                         rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/50
+                         text-slate-400 hover:text-primary
+                         hover:border-primary/50 hover:bg-primary/5 transition-all duration-200 cursor-pointer"
             >
-              <FiPlus className="w-4 h-4" />
-              <span>Add Another Configuration</span>
-            </button>
-          </div>
-
-          {/* ── Action Buttons ── */}
-          <div className="pt-6 mt-4 border-t border-border flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-3">
-            <button
-              type="button"
-              onClick={() => navigate("/projects/new/towers")}
-              className="group w-full md:w-auto flex items-center justify-center gap-2 py-3 px-6
-                         rounded-xl border border-border bg-white text-sm font-semibold text-text-body
-                         hover:border-slate-300 hover:text-text-heading hover:-translate-x-px
-                         active:translate-x-0 active:scale-[0.99]
-                         transition-all duration-300 cursor-pointer"
-            >
-              <FiArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform duration-300" />
-              <span>Back</span>
-            </button>
-            <button
-              type="submit"
-              className="group w-full md:w-auto flex items-center justify-center gap-2 py-3.5 px-8
-                         rounded-xl bg-primary text-white text-sm font-semibold
-                         hover:bg-primary-hover hover:-translate-y-px active:translate-y-0 active:scale-[0.99]
-                         shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/25
-                         transition-all duration-300 cursor-pointer"
-            >
-              <span>Next Step</span>
-              <FiArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-300" />
+              <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center mb-2">
+                <FiPlus className="w-6 h-6" />
+              </div>
+              <span className="text-sm font-bold text-text-heading">Add Another Configuration</span>
+              <span className="text-xs text-text-muted text-center max-w-[200px]">Create an additional unit layout and sizing</span>
             </button>
           </div>
 
         </form>
       </div>
-    </DashboardLayout>
+    </ProjectSetupLayout>
   );
 }

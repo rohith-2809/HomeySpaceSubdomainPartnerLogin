@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { FiArrowLeft, FiChevronRight } from "react-icons/fi";
-import DashboardLayout from "../../components/DashboardLayout";
+import { FiChevronRight, FiGrid } from "react-icons/fi";
+import AssignUnitLayout from "../../components/AssignUnitLayout";
 import { useProjects } from "../../context/ProjectContext";
 import { useAssignUnit } from "../../context/AssignUnitContext";
 
@@ -8,7 +8,7 @@ export default function AssignUnitTowerPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { getProject } = useProjects();
-  const { setFlatSelection } = useAssignUnit();
+  const { setFlatSelection, assignData } = useAssignUnit();
 
   const project = getProject(id);
 
@@ -19,66 +19,79 @@ export default function AssignUnitTowerPage() {
     navigate(`/projects/${id}/assign/flat`);
   };
 
-  return (
-    <DashboardLayout
-      activeNav="Projects"
-      locked={false}
-      topBarTitle="Assign Unit"
-      topBarSubtitle={project.name}
-    >
-      <div className="max-w-2xl mx-auto animate-fade-in space-y-6">
-        
-        {/* ── Header ── */}
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-text-heading tracking-tight mb-1">
-            Assign Unit
-          </h2>
-          <p className="text-sm text-text-muted">
-            Enter the buyer and booking details to assign this unit.
-          </p>
-        </div>
+  const selectedTowerId = assignData?.tower?.id;
 
-        {/* ── Step Content ── */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-bold text-text-heading px-1 mb-2">Select Tower</h3>
-          
-          <div className="grid gap-3">
-            {project.towers.map(tower => (
-              <button
-                key={tower.id}
-                onClick={() => handleSelectTower(tower)}
-                className="group flex items-center justify-between p-5 bg-white border border-border rounded-xl hover:border-primary hover:shadow-md transition-all text-left cursor-pointer"
-              >
-                <div>
-                  <h4 className="text-base font-bold text-text-heading mb-1">{tower.name}</h4>
-                  <div className="flex gap-4 text-xs">
-                    <div><span className="font-semibold text-text-heading">{tower.totalUnits}</span> <span className="text-text-muted">Total Units</span></div>
-                    <div><span className="font-semibold text-amber-500">{tower.soldUnits}</span> <span className="text-text-muted">Sold</span></div>
-                    <div><span className="font-semibold text-primary">{tower.availableUnits}</span> <span className="text-text-muted">Available</span></div>
-                  </div>
-                </div>
-                <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                  <FiChevronRight className="w-4 h-4 text-text-muted group-hover:text-primary" />
-                </div>
-              </button>
-            ))}
+  return (
+    <AssignUnitLayout
+      currentStep={1}
+      projectId={id}
+      projectName={project.name}
+      title="Assign Unit"
+      subtitle="Step 1: Select Tower"
+      hideNext={true}
+      hideBack={true}
+    >
+      <div className="animate-fade-in w-full max-w-5xl">
+        
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+          <div>
+            <h2 className="text-2xl font-bold text-text-heading tracking-tight mb-2">
+              Select Tower
+            </h2>
+            <p className="text-sm text-text-muted">
+              Choose the tower or block where the unit is located.
+            </p>
+          </div>
+          <div className="bg-primary/10 border border-primary/20 px-4 py-2.5 rounded-xl flex items-center gap-3">
+            <FiGrid className="w-5 h-5 text-primary" />
+            <div>
+              <p className="text-[10px] font-bold text-primary uppercase tracking-wider">Total Towers</p>
+              <p className="text-lg font-bold text-primary leading-none">{project.towers.length}</p>
+            </div>
           </div>
         </div>
 
-        <div className="pt-4 border-t border-border mt-8">
-          <button
-            type="button"
-            onClick={() => navigate(`/projects/${id}`)}
-            className="w-full flex items-center justify-center py-3.5 px-6
-                       rounded-xl bg-transparent border border-border text-text-body text-sm font-semibold
-                       hover:bg-slate-50 hover:text-text-heading hover:-translate-y-px active:translate-y-0 active:scale-[0.99]
-                       transition-all duration-300 cursor-pointer"
-          >
-            Back to Project
-          </button>
-        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {project.towers.map(tower => {
+            const isSelected = tower.id === selectedTowerId;
+            return (
+              <button
+                key={tower.id}
+                onClick={() => handleSelectTower(tower)}
+                className={`group flex flex-col p-6 rounded-2xl border transition-all text-left cursor-pointer
+                            ${isSelected 
+                              ? "bg-primary/5 border-primary shadow-sm" 
+                              : "bg-white border-border hover:border-primary/40 hover:shadow-md"}`}
+              >
+                <div className="flex justify-between items-start w-full mb-6">
+                  <h4 className={`text-lg font-bold ${isSelected ? "text-primary" : "text-text-heading"}`}>
+                    {tower.name}
+                  </h4>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors
+                                   ${isSelected ? "bg-primary text-white" : "bg-slate-50 text-text-muted group-hover:bg-primary/10 group-hover:text-primary"}`}>
+                    <FiChevronRight className="w-4 h-4" />
+                  </div>
+                </div>
 
+                <div className="grid grid-cols-3 gap-2 w-full mt-auto">
+                  <div className="bg-slate-50 rounded-xl p-3 text-center border border-slate-100">
+                    <p className="text-lg font-bold text-text-heading leading-none mb-1">{tower.totalUnits}</p>
+                    <p className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Total</p>
+                  </div>
+                  <div className="bg-amber-50 rounded-xl p-3 text-center border border-amber-100/50">
+                    <p className="text-lg font-bold text-amber-600 leading-none mb-1">{tower.soldUnits}</p>
+                    <p className="text-[10px] font-bold text-amber-700/60 uppercase tracking-wider">Sold</p>
+                  </div>
+                  <div className="bg-green-50 rounded-xl p-3 text-center border border-green-100/50">
+                    <p className="text-lg font-bold text-green-600 leading-none mb-1">{tower.availableUnits}</p>
+                    <p className="text-[10px] font-bold text-green-700/60 uppercase tracking-wider">Avail</p>
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </div>
-    </DashboardLayout>
+    </AssignUnitLayout>
   );
 }

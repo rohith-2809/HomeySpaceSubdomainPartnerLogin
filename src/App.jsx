@@ -12,6 +12,9 @@ import AccountVerifiedPage      from "./pages/AccountVerifiedPage";
 // Dashboard
 import DashboardHomePage        from "./pages/DashboardHomePage";
 import UnderConstructionPage    from "./pages/UnderConstructionPage";
+import TeamAccessPage           from "./pages/TeamAccessPage";
+import SalesPerformancePage     from "./pages/SalesPerformancePage";
+import SettingsPage             from "./pages/SettingsPage";
 
 // Project Setup Flow
 import ProjectsListPage         from "./pages/project/ProjectsListPage";
@@ -54,11 +57,11 @@ export default function App() {
             {/* ── Dashboard (Fully Authenticated) ── */}
             <Route path="/dashboard"              element={<DashboardHomePage />} />
             
-            {/* ── Under Construction Modules ── */}
-            <Route path="/team"                   element={<UnderConstructionPage />} />
-            <Route path="/sales"                  element={<UnderConstructionPage />} />
+            {/* ── Main Modules ── */}
+            <Route path="/team"                   element={<TeamAccessPage />} />
+            <Route path="/sales"                  element={<SalesPerformancePage />} />
             <Route path="/documents"              element={<UnderConstructionPage />} />
-            <Route path="/settings"               element={<UnderConstructionPage />} />
+            <Route path="/settings"               element={<SettingsPage />} />
 
             {/* ── Project Setup Flow ── */}
             <Route path="/projects"               element={<ProjectsListPage />} />
